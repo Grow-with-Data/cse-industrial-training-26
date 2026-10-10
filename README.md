@@ -65,7 +65,7 @@ Close the terminal and open a new one — the installer changes your PATH. Check
 
 - In Cursor/VS Code: **Ctrl/Cmd+Shift+P** → `Git: Clone` → paste the URL → sign in when the browser
   opens → pick a folder → **Open**.
-- URL: `https://github.com/Grow-with-Data/CSE-Industrial-Training-26.git`
+- URL: `https://github.com/Grow-with-Data/cse-industrial-training-26.git`
 - Each week, get the new session: **Source Control** → `⋯` → **Pull** (or `git pull`).
 - Clone refused? Your GitHub account isn't on the repo yet — send your username to your instructor.
 - **Windows:** clone into a plain folder such as `C:\dev\`, **not** a OneDrive-synced Desktop or
@@ -113,7 +113,7 @@ quota. Fix the first FAIL, run again.
 **7 · Open a notebook** — either way works, use whichever you prefer.
 
 **In the editor** — open `session-01/session-01.ipynb` → **Select Kernel**, top right → **Python
-Environments** → the one ending in `CSE-Industrial-Training-26/.venv` → **Shift+Enter** runs a cell.
+Environments** → the one ending in `cse-industrial-training-26/.venv` → **Shift+Enter** runs a cell.
 
 **In the browser** — JupyterLab, from the repo root:
 
