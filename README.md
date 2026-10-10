@@ -223,7 +223,7 @@ you and your instructors can see it: classmates can't open your work, and you ca
 This repo stays read-only for everyone.
 
 1. **Once:** send your GitHub username to your instructor. You'll get an email invitation to
-   `exercises-<your-github-username>` in the Grow-with-Data organization: accept it, then clone that
+   `cse26-exercises-<your-github-username>` in the Grow-with-Data organization: accept it, then clone that
    repo next to this one.
 2. **Each session:** do the exercises here, in a copy (`session-03/my-exercises.ipynb`), because the
    notebook needs this repo's `project/` and `data/` folders.
