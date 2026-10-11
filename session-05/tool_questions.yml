@@ -1,0 +1,57 @@
+# Questions for score_tools.py: which tools must the agent ask for?
+#
+# `must` lists the tools a correct run has to call. Order doesn't matter, and extra
+# calls aren't a failure: the tool path is the model's decision, and two good runs
+# can take different routes. An empty `must` means no tool should be called at all.
+#
+# `about` tags the questions a tool change could affect, so a notebook can rerun
+# only those (score_tools.py --about shipment).
+#
+# Written for session 5. None of these appear in the notebook's demos, and the
+# customers are the fixture's own (data/backend.yml).
+
+- question: "Where is my order ORD-5003?"
+  must: [get_shipment]
+  about: shipment
+- question: "What's the tracking number for ORD-5003?"
+  must: [get_shipment]
+  about: shipment
+- question: "ORD-5003 অর্ডারটি এখন কোথায় আছে?"
+  must: [get_shipment]
+  about: shipment
+- question: "tanvir@example.com here. When will my latest order arrive?"
+  must: [lookup_customer, list_orders, get_shipment]
+  about: shipment
+- question: "What's in order ORD-5002?"
+  must: [get_order]
+  about: order
+- question: "Was ORD-5004 delivered, and on what date?"
+  must: [get_order]
+  about: order
+- question: "I'm kamal@example.com. What have I ordered from you?"
+  must: [lookup_customer, list_orders]
+  about: customer
+- question: "My email is tanvir@example.com. List my orders with their totals."
+  must: [lookup_customer, list_orders]
+  about: customer
+- question: "What tier is my account? Email: kamal@example.com"
+  must: [lookup_customer]
+  about: customer
+- question: "Is the kettle in stock?"
+  must: [get_product]
+  about: product
+- question: "How much is the PulseFit smartwatch?"
+  must: [get_product]
+  about: product
+- question: "Does the TrailPack backpack come with a warranty?"
+  must: [get_product]
+  about: product
+- question: "Has my refund REF-9001 gone through yet?"
+  must: [check_refund_status]
+  about: refund
+- question: "What's the status of refund REF-9002?"
+  must: [check_refund_status]
+  about: refund
+- question: "What are your customer service hours?"
+  must: []
+  about: none
