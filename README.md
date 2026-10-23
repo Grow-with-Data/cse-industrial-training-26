@@ -264,7 +264,7 @@ Two sessions a week, Friday + Saturday, 19:30–21:30.
 | S03 | From chat to software | Pydantic in depth · structured output you can trust · extracting facts and checking them · prompt caching | v0.2 |
 | S04 | One interface to rule them all | LangChain's standard interface · five providers in one loop · switch and fallback · rate limits · LangSmith tracing | v1 |
 | S05 | Give it hands | tools and the agent loop, written by hand first · designing tools for a model · when a tool fails | v2 |
-| S06 | Remember and respond | state and short-term memory | v3 |
+| S06 | Remember and respond | checkpoints and threads · streaming a run as it happens · trimming and summarising a long conversation · moving to OpenRouter | v3 |
 | S07 | Safety rails | middleware · human-in-the-loop | v4 |
 | S08 | It should know your policies | embeddings and retrieval | v5 |
 | S09 | Answer with receipts | grounded generation, with citations | v6 |
@@ -281,16 +281,19 @@ Two sessions a week, Friday + Saturday, 19:30–21:30.
 | S20 | Demo day | your capstone | capstone |
 
 **What you need, and when:** `GEMINI_API_KEY` from session 1 · a free LangSmith account from
-session 4 · a deploy account and Qdrant Cloud (free tiers) at session 16. Qdrant in session 8 runs
-**locally, no signup**, and sessions 17–18 train on a free **Google Colab** GPU and serve the result
-through **Ollama** on your own machine — no keys for either.
+session 4 · an `OPENROUTER_API_KEY` from session 6 · a deploy account and Qdrant Cloud (free tiers)
+at session 16. Qdrant in session 8 runs **locally, no signup**, and sessions 17–18 train on a free
+**Google Colab** GPU and serve the result through **Ollama** on your own machine — no keys for either.
 
 ---
 
 ## Cost
 
-The course runs on **Gemini's free tier** throughout, on `gemini-3.1-flash-lite`. Staying inside the
-notebooks should cost you nothing.
+Sessions 1–5 run on **Gemini's free tier**, on `gemini-3.1-flash-lite`, and cost you nothing. From
+session 6 the snapshots default to **OpenRouter** on `openai/gpt-oss-20b`, an open-weights model at
+about two cents per million input tokens, because one key reaches open and closed models alike.
+Gemini's free tier still works with two lines in `.env`: `SHOPWISE_PROVIDER=google_genai` and
+`SHOPWISE_MODEL=gemini-3.5-flash-lite`.
 
 - **Search grounding** is free only on `gemini-2.5-flash`/`-flash-lite` (500 requests/day) and
   **image generation is free on no model.** Both are instructor demos, marked 💳; those cells explain
