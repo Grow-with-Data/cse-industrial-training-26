@@ -265,7 +265,7 @@ Two sessions a week, Friday + Saturday, 19:30–21:30.
 | S04 | One interface to rule them all | LangChain's standard interface · five providers in one loop · switch and fallback · rate limits · LangSmith tracing | v1 |
 | S05 | Give it hands | tools and the agent loop, written by hand first · designing tools for a model · when a tool fails | v2 |
 | S06 | Remember and respond | checkpoints and threads · streaming a run as it happens · trimming and summarising a long conversation · moving to OpenRouter | v3 |
-| S07 | Safety rails | middleware · human-in-the-loop | v4 |
+| S07 | Safety rails | middleware around the agent loop · PII, retries and call limits · the provider's own safety filter · a manager approves every refund | v4 |
 | S08 | It should know your policies | embeddings and retrieval | v5 |
 | S09 | Answer with receipts | grounded generation, with citations | v6 |
 | S10 | Open the black box | graphs — the agent, hand-built | v7 |
