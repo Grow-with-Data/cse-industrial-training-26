@@ -44,6 +44,8 @@ node_modules/
 # Local vector store (session 8 runs Qdrant on your machine)
 .qdrant/
 qdrant_storage/
+# session 8's knowledge base on disk, rebuilt any time by kb/ingest.py
+.state/
 
 # Scratch — keep the repo clean; put throwaway experiments here
 scratch/

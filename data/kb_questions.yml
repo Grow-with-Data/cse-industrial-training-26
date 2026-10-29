@@ -1,0 +1,172 @@
+# kb_questions.yml — the gold questions for the ShopWise knowledge base.
+#
+# WHO READS THIS
+#   S08 scores RETRIEVAL against it: for each answerable question, did a chunk from
+#   the expected `source` holding every `evidence` phrase appear in the top k
+#   (hit-rate@k), and how high (MRR)?
+#   S09 scores ANSWERS against it: is the cited source the expected one, does the
+#   answer agree with `reference`, and — for the `answerable: false` entries — did
+#   the assistant REFUSE instead of inventing a policy?
+#
+# SHAPE
+#   A list of entries, each with a stable `id` (verify.py requires it).
+#     question     phrased the way a customer would ask it
+#     answerable   false = the corpus does not cover it; the right answer is a refusal
+#     source       the policy file stem the answer lives in (answerable only)
+#     section      for markdown: the `## ` heading text, exactly as ingestion records
+#                  it in chunk metadata. For a PDF: "p.N", the 1-based page number.
+#     evidence     phrases that must ALL appear in ONE retrieved chunk for it to count
+#                  as found. The section alone is too coarse: a 200-character chunk
+#                  still carries its section's name after the rule has been cut away
+#                  from its condition. Evidence is what catches that.
+#     reference    the correct answer in one sentence — S09's correctness judge
+#                  compares against it. For a refusal, what a good refusal says.
+#
+# THE TRAP THIS FILE GUARDS AGAINST
+#   Editing a policy heading silently breaks every `section` below that names it:
+#   retrieval still finds the clause, but the scorer marks it a miss. verify.py
+#   checks every (source, section) pair still exists in the corpus.
+#
+#   The four unanswerable questions are load-bearing too: if a policy ever starts
+#   mentioning price-matching, discounts, instalments or opening hours, S09's
+#   refusal demo stops refusing. verify.py checks the corpus stays silent on them.
+
+- id: KBQ-01
+  question: My AeroSound headphones are opened — can I still return them after 20 days?
+  answerable: true
+  source: returns-policy
+  section: 1. The return window
+  evidence: ["Opened audio", "15 days"]
+  reference: No. Opened audio products can be returned within 15 days of delivery, for hygiene reasons.
+
+- id: KBQ-02
+  question: How long do I have to send back something I haven't used?
+  answerable: true
+  source: returns-policy
+  section: 1. The return window
+  evidence: ["30 days of the delivery date"]
+  reference: 30 days from the delivery date, unused and in original packaging.
+
+- id: KBQ-03
+  question: Can I get a refund on a gift card someone gave me?
+  answerable: true
+  source: returns-policy
+  section: 2. What cannot be returned
+  evidence: ["Gift cards", "received as a present"]
+  reference: No. Gift cards cannot be returned, including gift cards received as a present.
+
+- id: KBQ-04
+  question: How long until my refund shows up on my card?
+  answerable: true
+  source: returns-policy
+  section: 3. How refunds are paid
+  evidence: ["5–7 business days"]
+  reference: 5–7 business days after the returned item reaches the warehouse, to the original payment method.
+
+- id: KBQ-05
+  question: I'm a gold member — do I have to pay for return shipping?
+  answerable: true
+  source: returns-policy
+  section: 3. How refunds are paid
+  evidence: ["gold-tier members", "free return shipping"]
+  reference: No. Gold-tier members receive free return shipping.
+
+- id: KBQ-06
+  question: Do you ship to Malaysia?
+  answerable: true
+  source: shipping-policy
+  section: 1. Where we ship
+  evidence: ["ship internationally"]
+  reference: No. ShopWise ships within the United States only and does not ship internationally.
+
+- id: KBQ-07
+  question: How much is express delivery and how fast is it?
+  answerable: true
+  source: shipping-policy
+  section: 2. Delivery options and rates
+  evidence: ["Express", "$12.99"]
+  reference: Express costs $12.99 and takes 1–2 business days from dispatch.
+
+- id: KBQ-08
+  question: Is standard shipping free if my order is $60?
+  answerable: true
+  source: shipping-policy
+  section: 2. Delivery options and rates
+  evidence: ["$4.99", "$75 or more"]
+  reference: No. Standard shipping is free only when the order subtotal is $75 or more; otherwise it is $4.99.
+
+- id: KBQ-09
+  question: My tracking hasn't moved in 8 business days. Is my parcel lost?
+  answerable: true
+  source: shipping-policy
+  section: 4. Delays and lost parcels
+  evidence: ["7 business days"]
+  reference: Yes. A parcel is treated as lost after 7 business days without a tracking update; support will replace or refund it.
+
+- id: KBQ-10
+  question: How long is the warranty on a smartwatch?
+  answerable: true
+  source: warranty-policy
+  section: 2. How long each product type is covered
+  evidence: ["Wearables", "24 months"]
+  reference: 24 months from delivery — wearables are covered for 24 months.
+
+- id: KBQ-11
+  question: Does the TrailPack backpack come with a warranty?
+  answerable: true
+  source: warranty-policy
+  section: 2. How long each product type is covered
+  evidence: ["Outdoor", "no warranty"]
+  reference: No. Outdoor products carry no ShopWise warranty; faults within 30 days can be raised under the returns policy.
+
+- id: KBQ-12
+  question: I dropped my kettle and the base cracked. Is that covered?
+  answerable: true
+  source: warranty-policy
+  section: 1. What the warranty covers
+  evidence: ["accidental damage"]
+  reference: No. The warranty does not cover accidental damage such as drops.
+
+- id: KBQ-13
+  question: What do I need to send to make a warranty claim?
+  answerable: true
+  source: warranty-policy
+  section: 3. Making a claim
+  evidence: ["order number", "photo or short video"]
+  reference: Your order number and a photo or short video that shows the fault.
+
+- id: KBQ-14
+  question: If a seller doesn't say when they'll ship, how long do they legally have?
+  answerable: true
+  source: ftc-prompt-delivery
+  section: p.1
+  evidence: ["within 30 days"]
+  reference: Under the FTC's Mail Order Rule a seller must have a reasonable basis to ship within 30 days when no time is stated. This is federal law about sellers, not a ShopWise promise.
+
+- id: KBQ-15
+  question: What's the legal difference between a "full" and a "limited" warranty?
+  answerable: true
+  source: cfr-16-part-700
+  section: p.4
+  evidence: ["Limited Warranty"]
+  reference: Federal rules (16 CFR 700.6) require a written warranty on a consumer product costing more than $10 to be designated either "Full (duration) Warranty" or "Limited Warranty".
+
+- id: KBQ-16
+  question: What's your price-match policy?
+  answerable: false
+  reference: The policy documents do not cover price matching; a human agent should follow up.
+
+- id: KBQ-17
+  question: Do you give student discounts?
+  answerable: false
+  reference: The policy documents do not cover discounts; a human agent should follow up.
+
+- id: KBQ-18
+  question: Can I pay for my order in monthly instalments?
+  answerable: false
+  reference: The policy documents do not cover payment plans; a human agent should follow up.
+
+- id: KBQ-19
+  question: What time does your store open on Saturdays?
+  answerable: false
+  reference: The policy documents do not cover opening hours; a human agent should follow up.

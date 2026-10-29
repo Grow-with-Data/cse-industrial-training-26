@@ -43,8 +43,13 @@ dependencies = [
     "pillow>=11.0",               # reading the image the model is shown (S01, section 4.3)
 
     # --- from S08: retrieval ---
-    "qdrant-client>=1.15",
+    # Qdrant runs embedded, inside Python, on disk in .state/qdrant. The [fastembed]
+    # extra brings small CPU models: keyword vectors, and a keyless embedding
+    # fallback. PDFs are read with pypdf directly.
+    "qdrant-client[fastembed]>=1.15",
     "langchain-qdrant>=1.0",
+    "langchain-text-splitters>=1.1",   # not pulled in by langchain itself
+    "pypdf>=6.0",
 
     # --- from S13: serving ---
     "fastapi>=0.141.1",
