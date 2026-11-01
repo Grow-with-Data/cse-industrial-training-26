@@ -267,7 +267,7 @@ Two sessions a week, Friday + Saturday, 19:30–21:30.
 | S06 | Remember and respond | checkpoints and threads · streaming a run as it happens · trimming and summarising a long conversation · moving to OpenRouter | v3 |
 | S07 | Safety rails | middleware around the agent loop · PII, retries and call limits · the provider's own safety filter · a manager approves every refund | v4 |
 | S08 | It should know your policies | prompt, RAG or fine-tune · loaders, chunking and metadata · embeddings and the same-space rule · Qdrant on disk with stable ids · retrieval scored before any answer | v5 |
-| S09 | Answer with receipts | grounded generation, with citations | v6 |
+| S09 | Answer with receipts | grounded answers with citations and a fixed refusal · 2-step vs agentic RAG · hybrid search and re-ranking · scoring refusal, citation and groundedness · LLM judges checked against a human · LangSmith experiments | v6 |
 | S10 | Open the black box | graphs — the agent, hand-built | v7 |
 | S11 | Pause, resume, remember forever | interrupts · long-term memory | v8 |
 | S12 | A team of specialists | multi-agent systems | v9 |

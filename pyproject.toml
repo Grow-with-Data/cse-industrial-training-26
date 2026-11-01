@@ -51,6 +51,11 @@ dependencies = [
     "langchain-text-splitters>=1.1",   # not pulled in by langchain itself
     "pypdf>=6.0",
 
+    # --- from S09: scoring grounded answers ---
+    # openevals: ready-made LLM-as-judge evaluators (groundedness, correctness)
+    # that plug into LangSmith experiments.
+    "openevals>=0.2",
+
     # --- from S13: serving ---
     "fastapi>=0.141.1",
     "uvicorn[standard]>=0.52",
