@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session 10 — Open the black box · AI/LLM Application Builder</title>
+<!--
+  Self-contained presenter deck. No build step, no server, no network.
+  Double-click to open; works offline in a classroom.
+
+  Keys:  → / space  next     ← prev     o  overview     n  presenter notes
+         f  fullscreen        Home/End  first/last      ?  help
+  Cmd/Ctrl-P prints one slide per page for a PDF handout.
+
+  EIGHT SLIDES, FOR THE FIRST 5-10 MINUTES. The cover; "can you guarantee it
+  always checks the order first?"; what you'll learn; the night on one page (the
+  session-map plate); where tonight fits; where this shows up at work; the
+  five-patterns cheat sheet (left up during notebook Part B); what you'll leave
+  with. Then switch to session-10.ipynb, which does the teaching. The deck is
+  the overview and the why; it does not duplicate the notebook.
+
+  The plates are ../figures/session-map.png, ../figures/five-patterns.png and
+  ../figures/v7-architecture.png, the same images the notebook uses, so the two
+  can never disagree. (CSE program.)
+-->
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+
+  :root{
+    /* growwithdata.net palette — copied from course-design/brochure.html */
+    --dark:#14212e; --muted:#5b6b77;
+    --green:#2e9e5b; --green-soft:#e7f6ee;
+    --teal:#2f9e8f;
+    --cyan:#59c1e8; --cyan-soft:#eaf7fc;
+    --bg:#f2faf6; --paper:#ffffff; --line:#e2ede7;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  }
+
+  html,body{height:100%}
+  body{
+    background:var(--bg); color:var(--dark); font-family:var(--sans);
+    -webkit-font-smoothing:antialiased; overflow:hidden;
+  }
+
+  /* --- slide frame ------------------------------------------------------- */
+  .deck{position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:3vh 4vw 7vh}
+  .slide{
+    display:none; width:100%; max-width:1180px; max-height:90vh; overflow-y:auto;
+    background:var(--paper); border:1px solid var(--line); border-radius:14px;
+    padding:clamp(20px,3.2vw,44px); box-shadow:0 10px 40px rgba(20,33,46,.07);
+  }
+  .slide.on{display:block; animation:in .18s ease-out}
+  @keyframes in{from{opacity:0; transform:translateY(6px)}to{opacity:1; transform:none}}
+
+  /* --- typography ------------------------------------------------------- */
+  .kicker{
+    font-size:clamp(11px,1.05vw,13px); font-weight:700; letter-spacing:.13em; text-transform:uppercase;
+    color:var(--teal); margin-bottom:10px;
+  }
+  h1{font-size:clamp(30px,4.4vw,58px); line-height:1.06; letter-spacing:-.02em; font-weight:800}
+  h2{font-size:clamp(23px,2.9vw,38px); line-height:1.14; letter-spacing:-.015em; font-weight:750; margin-bottom:14px}
+  h3{font-size:clamp(16px,1.5vw,21px); font-weight:700; margin:20px 0 8px}
+  p{font-size:clamp(15px,1.42vw,19px); line-height:1.6; color:#263a4b; margin-bottom:12px; max-width:74ch}
+  .lead{font-size:clamp(17px,1.72vw,23px); color:var(--muted)}
+  strong{color:var(--dark); font-weight:700}
+  em{color:var(--teal); font-style:normal; font-weight:650}
+  a{color:var(--green)}
+  ul{margin:6px 0 12px 22px} li{font-size:clamp(14px,1.36vw,18px); line-height:1.55; margin-bottom:8px; color:#263a4b}
+  code{font-family:var(--mono); font-size:.9em; background:var(--green-soft); color:#17603a; padding:.1em .38em; border-radius:4px}
+
+  .rule{height:3px; width:64px; background:var(--green); border-radius:2px; margin:14px 0 18px}
+
+  /* --- cover ------------------------------------------------------------- */
+  .slide.cover{padding:0; overflow:hidden}
+  .cover .top{
+    background:linear-gradient(160deg,#f6fcf9 0%,var(--bg) 58%,#eaf7f0 100%);
+    padding:clamp(22px,3vw,38px) clamp(24px,3.4vw,46px) clamp(20px,2.6vw,32px);
+    border-bottom:1px solid var(--line);
+  }
+  .brandrow{display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap}
+  .brand{display:flex; align-items:center; gap:12px}
+  .brand img{width:clamp(44px,4.4vw,58px); height:clamp(44px,4.4vw,58px); border-radius:13px;
+             background:#fff; box-shadow:0 3px 10px rgba(20,33,46,.10); padding:4px}
+  .brand .bn{font-weight:800; font-size:clamp(14px,1.28vw,17px); line-height:1.2}
+  .brand .bu{font-size:clamp(11px,1.04vw,13.5px); color:var(--green); font-weight:600}
+  .badge{display:inline-flex; align-items:center; gap:8px; background:var(--dark); color:#fff;
+         border-radius:999px; padding:8px 18px; font-size:clamp(11px,1.05vw,13.5px); font-weight:600}
+  .badge b{color:#8fe3b8; font-weight:600}
+  .badge .ic{color:#8fe3b8}
+
+  /* Lucide sprite: stroked, not filled — the sprite paths carry no fill of their own */
+  .ic{width:1.05em; height:1.05em; stroke:currentColor; fill:none; stroke-width:2;
+      stroke-linecap:round; stroke-linejoin:round; flex:none; display:block; margin:0}
+  .fct .ic{color:var(--green)}
+
+  .cover h1{margin:clamp(16px,2vw,26px) 0 10px}
+  .cover h1 .g{color:var(--green)} .cover h1 .c{color:var(--cyan)}
+  .cover .sub{font-size:clamp(14px,1.42vw,18.5px); color:#33505f; max-width:60ch; line-height:1.55}
+  .facts{display:flex; flex-wrap:wrap; gap:9px; margin-top:clamp(14px,1.7vw,20px)}
+  .fct{display:inline-flex; align-items:center; gap:7px; background:#fff; border:1.5px solid var(--line);
+       border-radius:999px; padding:7px 15px; font-weight:600; font-size:clamp(11.5px,1.1vw,14px)}
+  .fct b{color:var(--green)}
+
+  .cover .btm{display:grid; grid-template-columns:1fr 1.1fr; gap:clamp(18px,2.6vw,34px);
+              padding:clamp(18px,2.4vw,30px) clamp(24px,3.4vw,46px) clamp(20px,2.6vw,32px)}
+  @media (max-width:900px){.cover .btm{grid-template-columns:1fr}}
+  .sesscard{background:var(--green-soft); border-left:4px solid var(--green); border-radius:11px;
+            padding:clamp(14px,1.7vw,20px) clamp(16px,1.9vw,22px); align-self:start}
+  .sesscard .n{font-size:clamp(10.5px,1vw,12.5px); font-weight:700; letter-spacing:.13em;
+               text-transform:uppercase; color:var(--teal)}
+  .sesscard .t{font-size:clamp(19px,2.1vw,27px); font-weight:800; margin:4px 0 6px; letter-spacing:-.01em}
+  .sesscard .d{font-size:clamp(12.5px,1.16vw,15px); color:#33505f; line-height:1.5}
+
+  .pres .lbl{font-size:clamp(10.5px,1vw,12.5px); font-weight:700; letter-spacing:.14em;
+             text-transform:uppercase; color:var(--muted); margin-bottom:9px}
+  .pres .who{font-size:clamp(18px,1.95vw,25px); font-weight:800; letter-spacing:-.01em}
+  .pres .lnk{font-size:clamp(11.5px,1.1vw,14px); margin:3px 0 12px; color:var(--teal); font-weight:600}
+  .pres .lnk span{color:var(--line); margin:0 6px}
+  .roles{display:grid; gap:7px}
+  .role{display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:start;
+        border-top:1px dashed var(--line); padding-top:7px}
+  .role .dot{width:7px; height:7px; border-radius:50%; background:var(--green); margin-top:7px}
+  .role .dot.c{background:var(--cyan)} .role .dot.t{background:var(--teal)}
+  .role .rt{font-weight:700; font-size:clamp(12.5px,1.16vw,15px); line-height:1.3}
+  .role .ro{font-size:clamp(11px,1.06vw,13.5px); color:var(--muted); line-height:1.4}
+  .role .ro a{color:var(--teal); text-decoration:none; font-weight:600}
+
+
+  /* Short viewports — 720p projectors and laptop screens. The cover is the
+     densest slide in the deck; compress it here rather than let the last
+     role row (Founder · Grow with Data) fall below the fold. */
+  @media (max-height:820px){
+    .cover .top{padding:16px 26px 14px}
+    .cover h1{margin:10px 0 6px; font-size:clamp(24px,3.3vw,38px)}
+    .cover .sub{font-size:clamp(12px,1.15vw,15px)}
+    .facts{margin-top:10px; gap:7px}
+    .fct{padding:5px 12px; font-size:clamp(11px,1vw,13px)}
+    .brand img{width:44px; height:44px}
+    .cover .btm{padding:13px 26px 15px; gap:20px}
+    .sesscard{padding:11px 14px}
+    .sesscard .t{font-size:clamp(16px,1.8vw,21px); margin:3px 0 4px}
+    .sesscard .d{font-size:clamp(11.5px,1.05vw,13.5px)}
+    .pres .who{font-size:clamp(16px,1.7vw,21px)}
+    .pres .lnk{margin:2px 0 7px}
+    .roles{gap:4px}
+    .role{padding-top:5px}
+    .role .rt{font-size:clamp(11.5px,1.06vw,14px)}
+    .role .ro{font-size:clamp(10.5px,1vw,12.5px)}
+  }
+
+  /* Slide -> notebook choreography, printed on the slide so it cannot be
+     forgotten mid-session. The deck signposts; the notebook teaches. */
+  .switch{
+    margin-top:16px; padding:11px 16px; border-radius:10px;
+    background:var(--dark); color:#cfe8d9;
+    font-size:clamp(12px,1.16vw,15px); font-weight:600; line-height:1.45;
+  }
+  .switch b{color:#8fe3b8}
+  .switch code{background:#22384a; color:#cfe8d9}
+
+  /* --- reusable blocks -------------------------------------------------- */
+  .grid{display:grid; gap:14px}
+  .g2{grid-template-columns:repeat(2,1fr)} .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  @media (max-width:860px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+  .card{background:var(--bg); border:1px solid var(--line); border-radius:11px; padding:16px 18px}
+  .card .t{font-weight:750; font-size:clamp(14px,1.3vw,17px); margin-bottom:5px}
+  .card .d{font-size:clamp(13px,1.18vw,15px); color:var(--muted); line-height:1.5}
+  .card.accent{border-left:4px solid var(--green)}
+  .card.warn{border-left:4px solid #c9721f; background:#fdf6ee}
+  .card.cyan{border-left:4px solid var(--cyan); background:var(--cyan-soft)}
+  .card.dark{background:var(--dark); border-color:var(--dark)}
+  .card.dark .t{color:#fff} .card.dark .d{color:#a9c2d1}
+  /* The global strong/em colours are tuned for light cards and VANISH on a dark
+     one — strong resolves to var(--dark), i.e. #14212e text on a #14212e panel.
+     Caught by eye at 1024x640; no assertion would have found it. */
+  .card.dark strong{color:#fff}
+  .card.dark em{color:#8fe3b8}
+
+  table{width:100%; border-collapse:collapse; margin:10px 0 14px; font-size:clamp(13px,1.22vw,16px)}
+  th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  th{font-size:clamp(11px,1vw,13px); text-transform:uppercase; letter-spacing:.07em; color:var(--teal); font-weight:700}
+  td.num{font-family:var(--mono); text-align:right; white-space:nowrap}
+  tr.hi td{background:var(--green-soft); font-weight:650}
+
+  pre{
+    background:var(--dark); color:#dbe7ef; border-radius:10px; padding:15px 17px; overflow-x:auto;
+    font-family:var(--mono); font-size:clamp(12px,1.12vw,15px); line-height:1.55; margin:10px 0 14px;
+  }
+  pre .c{color:#7f96a6} pre .k{color:#7fd1b9} pre .s{color:#9ed7f2}
+
+  .out{
+    background:var(--paper); border:1px solid var(--line); border-left:4px solid var(--cyan);
+    border-radius:9px; padding:14px 17px; font-family:var(--mono);
+    font-size:clamp(12px,1.14vw,15px); line-height:1.6; color:#263a4b; white-space:pre-wrap; margin:10px 0 12px;
+  }
+
+  .big{font-size:clamp(38px,6vw,78px); font-weight:800; line-height:1; letter-spacing:-.03em; color:var(--green)}
+  .big.alt{color:var(--teal)}
+  .unit{font-size:clamp(12px,1.15vw,15px); color:var(--muted); text-transform:uppercase; letter-spacing:.09em; font-weight:700; margin-top:6px}
+
+  .tickets{display:grid; grid-template-columns:repeat(auto-fill,minmax(215px,1fr)); gap:8px; margin-top:12px}
+  .tk{background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:clamp(11px,1.02vw,13.5px); line-height:1.35}
+  .tk b{display:block; font-family:var(--mono); font-size:.85em; color:var(--teal); font-weight:700}
+  .tk.shout{background:#fdf1ec; border-color:#f0cdbe} .tk.bn{background:var(--cyan-soft); border-color:#cbe9f6}
+
+  .pill{display:inline-block; font-size:clamp(10px,.95vw,12.5px); font-weight:700; letter-spacing:.05em;
+        padding:3px 9px; border-radius:999px; background:var(--green-soft); color:#17603a; margin:0 5px 5px 0}
+  .pill.grey{background:#eef2f5; color:var(--muted)}
+  .pill.cy{background:var(--cyan-soft); color:#1d7ba3}
+
+  .url{display:inline-block; font-family:var(--mono); font-size:clamp(12px,1.2vw,16px); font-weight:700;
+       background:var(--dark); color:#8fe3b8; border-radius:8px; padding:7px 14px; margin:4px 0 10px}
+
+  svg{display:block; width:100%; height:auto; margin:8px 0 12px}
+  svg text{font-family:var(--sans)}
+
+  /* --- chrome ----------------------------------------------------------- */
+  .progress{position:fixed; top:0; left:0; height:3px; background:var(--green); z-index:60; transition:width .18s}
+  .foot{position:fixed; left:0; right:0; bottom:0; height:5vh; min-height:34px; display:flex; align-items:center;
+        justify-content:space-between; padding:0 clamp(12px,2.4vw,26px); font-size:clamp(10px,1.02vw,13px);
+        color:var(--muted); background:linear-gradient(transparent,rgba(242,250,246,.96) 42%); z-index:55}
+  .foot .brand{font-weight:700; color:var(--teal)}
+  .foot .mid{font-variant-numeric:tabular-nums}
+  .foot kbd{font-family:var(--mono); background:var(--paper); border:1px solid var(--line);
+            border-bottom-width:2px; border-radius:4px; padding:1px 5px; font-size:.92em; color:var(--dark)}
+
+  .zone{position:fixed; top:0; bottom:5vh; width:11vw; z-index:50; cursor:pointer}
+  .zone.l{left:0} .zone.r{right:0}
+
+  .notes{
+    display:none; position:fixed; left:0; right:0; bottom:5vh; z-index:58;
+    background:var(--dark); color:#cfe0ea; padding:13px clamp(14px,2.6vw,28px);
+    font-size:clamp(12px,1.14vw,15px); line-height:1.55; border-top:3px solid var(--teal);
+  }
+  .notes.on{display:block}
+  .notes b{color:var(--cyan)}
+  .notes .mins{display:inline-block; font-family:var(--mono); background:var(--teal); color:#fff;
+               border-radius:5px; padding:1px 7px; margin-right:9px; font-weight:700}
+
+  .overlay{display:none; position:fixed; inset:0; background:rgba(20,33,46,.965); z-index:70;
+           padding:clamp(16px,3vw,34px); overflow-y:auto}
+  .overlay.on{display:block}
+  .overlay h4{color:#fff; font-size:clamp(15px,1.5vw,20px); margin-bottom:14px; font-weight:700}
+  .ovgrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(178px,1fr)); gap:10px}
+  .ov{background:#1b2b3a; border:1px solid #2b4050; border-radius:9px; padding:11px 13px; cursor:pointer; color:#cfe0ea}
+  .ov:hover{border-color:var(--cyan)} .ov.cur{border-color:var(--green); background:#203b34}
+  .ov .n{font-family:var(--mono); font-size:11px; color:var(--cyan); font-weight:700}
+  .ov .t{font-size:13.5px; margin-top:3px; line-height:1.32; color:#e8f1f6}
+  .overlay .keys{color:#9fb6c4; font-size:13.5px; line-height:1.9; margin-top:18px}
+  .overlay .keys kbd{font-family:var(--mono); background:#22313f; border:1px solid #34495c; border-radius:4px;
+                     padding:1px 6px; color:#e8f1f6}
+
+  @media print{
+    body{overflow:visible; background:#fff}
+    .deck{position:static; padding:0; display:block}
+    .slide{display:block !important; max-height:none; page-break-after:always; box-shadow:none;
+           border:none; border-bottom:1px solid #ddd; margin-bottom:0}
+    .foot,.zone,.progress,.notes,.overlay{display:none !important}
+  }
+
+  /* --- slide 2: objectives + map ------------------------------------------ */
+  .overview{display:grid; grid-template-columns:minmax(280px,.72fr) 1.4fr; gap:clamp(16px,2vw,28px); align-items:start}
+  @media (max-width:980px){.overview{grid-template-columns:1fr}}
+  .obj{list-style:none; margin:4px 0 0; padding:0; counter-reset:o}
+  .obj li{counter-increment:o; position:relative; padding:6px 0 6px 38px; border-top:1px solid var(--line);
+          font-size:clamp(12.5px,1.08vw,15px); line-height:1.4; margin:0}
+  .obj li:first-child{border-top:none}
+  .obj li::before{content:counter(o); position:absolute; left:0; top:7px; width:24px; height:24px; border-radius:50%;
+                  background:var(--teal); color:#fff; font-weight:800; font-size:14px; display:flex;
+                  align-items:center; justify-content:center}
+  .obj .tag{display:inline-block; font-size:.72em; font-weight:800; letter-spacing:.08em; color:var(--teal);
+            margin-right:6px}
+  .mapfig{margin:0; background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:8px}
+  .mapfig img{display:block; width:100%; height:auto; border-radius:8px}
+  .mapfig figcaption{font-size:clamp(11px,1vw,13px); color:var(--muted); padding:8px 6px 2px}
+  .hook{margin-top:10px; background:#fdf6ee; border-left:4px solid #c9721f; border-radius:10px; padding:12px 16px}
+  .hook .q{font-size:clamp(14px,1.35vw,18px); font-weight:700; color:var(--dark)}
+  .hook .d{font-size:clamp(12px,1.12vw,14.5px); color:var(--muted); margin-top:4px; line-height:1.45}
+
+  /* --- session 4 additions ------------------------------------------------ */
+  .quote{font-size:clamp(20px,2.4vw,32px); font-weight:800; line-height:1.25; letter-spacing:-.01em;
+         border-left:5px solid #c9721f; padding:4px 0 4px 18px; margin:6px 0 18px}
+  .quote small{display:block; font-size:clamp(12px,1.1vw,14px); color:var(--muted); font-weight:600; margin-top:6px}
+  .story .k{font-size:clamp(10.5px,1vw,12.5px); font-weight:800; letter-spacing:.12em; text-transform:uppercase;
+            color:var(--teal); margin-bottom:6px}
+  .story .t{font-size:clamp(15px,1.45vw,19px)}
+  .src{font-size:clamp(10.5px,.95vw,12px); color:var(--muted); margin-top:12px; line-height:1.5}
+  .src a{color:var(--muted)}
+  .work td:first-child{font-weight:650; width:42%}
+  .work td.sec{font-family:var(--mono); color:var(--teal); white-space:nowrap; width:1%}
+  .leave{display:grid; grid-template-columns:1.5fr .9fr; gap:clamp(16px,2vw,26px); align-items:start}
+  @media (max-width:980px){.leave{grid-template-columns:1fr}}
+  .keys li{list-style:none; margin-left:-22px; padding:7px 0; border-top:1px solid var(--line)}
+  .keys li:first-child{border-top:none}
+</style>
+</head>
+<body>
+
+<!-- Lucide icon sprite, same set the brochure uses — keeps the cover's chrome
+     identical to course-design/brochure.html rather than drifting to emoji. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-cap" viewBox="0 0 24 24"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+</svg>
+
+<div class="progress" id="prog"></div>
+<div class="deck" id="deck">
+
+
+<section class="slide cover" data-title="Cover" data-mins="0–1"
+  data-notes="One minute. Last night v6 learned to cite or refuse. Tonight it stops choosing its own steps where a step must always happen. Keys needed: OpenRouter (answers) and Gemini (embeddings) in labs/.env, LangSmith login for the Studio demo. The notebook is call-heavy: section 16 has a LIMIT.">
+  <div class="top">
+    <div class="brandrow">
+      <div class="brand">
+        <div>
+          <div class="bn">Grow with Data</div>
+          <div class="bu">growwithdata.net</div>
+        </div>
+      </div>
+      <div class="badge"><svg class="ic"><use href="#i-cap"/></svg><b>Industrial Training Program</b></div>
+    </div>
+    <h1><span class="g">AI/LLM</span> Application Builder<br>From Zero to <span class="c">Mastery</span></h1>
+    <div class="sub">A practice-first industrial training in modern AI application engineering —
+    one real system, built session by session, deployed live.</div>
+    <div class="facts">
+      <span class="fct"><svg class="ic"><use href="#i-calendar"/></svg><b>10</b>&nbsp;Weeks</span>
+      <span class="fct"><svg class="ic"><use href="#i-layers"/></svg><b>20</b>&nbsp;Sessions</span>
+      <span class="fct"><svg class="ic"><use href="#i-clock"/></svg><b>40</b>&nbsp;Contact Hours</span>
+      <span class="fct"><svg class="ic"><use href="#i-clock"/></svg>Friday &amp; Saturday ·&nbsp;<b>7:30–9:30 PM</b></span>
+      <span class="fct"><svg class="ic"><use href="#i-users"/></svg>Live · Instructor-led</span>
+    </div>
+  </div>
+
+  <div class="btm">
+    <div class="sesscard">
+      <div class="n">Session 10 of 20 · Week 5, Saturday · v6 → v7</div>
+      <div class="t">Open the black box</div>
+      <div class="d">Since session 5 every answer has come out of <code>create_agent</code>, and the agent has chosen its own steps. Tonight we open it, build the graph it is made of, and use five workflow patterns to put the steps that must always happen into edges, including two retrieval techniques that must earn their calls on the scorecard.</div>
+    </div>
+
+    <div class="pres">
+      <div class="lbl">Presented by</div>
+      <div class="who">Md Kalim Amzad Chy</div>
+      <div class="lnk">kalimamzad.com <span>·</span> linkedin.com/in/kalimamzad</div>
+      <div class="roles">
+        <div class="role"><div class="dot"></div><div>
+          <div class="rt">Head of AI Innovation</div>
+          <div class="ro">Liberate Labs · Austin, Texas · <a href="https://liberate-labs.com">liberate-labs.com</a></div>
+        </div></div>
+        <div class="role"><div class="dot c"></div><div>
+          <div class="rt">Co-founder</div>
+          <div class="ro">Kodevite · Gulshan-1, Dhaka · <a href="https://kodevite.com">kodevite.com</a></div>
+        </div></div>
+        <div class="role"><div class="dot t"></div><div>
+          <div class="rt">Founder</div>
+          <div class="ro">Grow with Data · Mirpur-12, Dhaka · <a href="https://growwithdata.net">growwithdata.net</a></div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══ 2 · THE QUESTION ═══════════════════════════════════════════════════ -->
+<section class="slide" data-title="The question every AI product hits" data-mins="2"
+  data-notes="Three cards, one per idea. Anthropic's line is tonight's spine: who chooses the next step. Klarna is the proof that graphs run real support at scale; say the numbers are self-reported. The third card is the opening of tonight's notebook: run it live, three times, and count how many runs looked the order up. That is what a compliance officer means by 'not a guarantee'.">
+  <div class="kicker">Session 10 · why tonight matters</div>
+  <h2>The question every AI product hits</h2>
+  <div class="quote">“Can you guarantee it always checks the order first?”
+    <small>— every compliance officer who reads an agent's transcript</small></div>
+  <div class="grid g3">
+    <div class="card cyan story">
+      <div class="k">The distinction</div>
+      <div class="t"><strong>Workflows and agents</strong></div>
+      <div class="d">Anthropic's engineering team: workflows run on “predefined code paths”; agents “dynamically direct their own processes and tool usage”. Workflows give “predictability and consistency for well-defined tasks.”</div>
+    </div>
+    <div class="card story">
+      <div class="k">At scale</div>
+      <div class="t"><strong>Support, as a graph</strong></div>
+      <div class="d">Klarna's support assistant is “built on LangGraph” with a “controllable agent architecture”. LangChain lists Uber, LinkedIn and Elastic running LangGraph in production. (Vendor case studies: figures self-reported.)</div>
+    </div>
+    <div class="card warn story">
+      <div class="k">Tonight, live</div>
+      <div class="t"><strong>One question, three runs</strong></div>
+      <div class="d">We ask v6 “can I still return ORD-5004?” three times and read the tool paths. Nothing <em>makes</em> it look up the delivery date. It usually chooses to, and “usually” is the problem.</div>
+    </div>
+  </div>
+  <div class="src">Sources: <a href="https://www.anthropic.com/engineering/building-effective-agents">Anthropic, Building effective agents (Dec 2024)</a> ·
+    <a href="https://www.langchain.com/blog/customers-klarna">LangChain, Klarna case study (Feb 2025)</a> ·
+    <a href="https://www.langchain.com/blog/is-langgraph-used-in-production">LangChain, Is LangGraph used in production? (Feb 2025)</a> ·
+    notebook section 2</div>
+</section>
+
+
+<!-- ═══ 3 · WHAT YOU'LL LEARN ═══════════════════════════════════════════════ -->
+<section class="slide" data-title="What you'll learn tonight" data-mins="1–2"
+  data-notes="Two big ideas: the graph model (items 1 to 4) and the five workflow patterns (5 to 8). Item 4 is the reveal to land: create_agent is a graph, and your session 7 rails are nodes in it. Item 6 is the payoff: Send. Item 8 is the habit: a technique ships only if the number moves.">
+  <div class="kicker">Session 10 · Open the black box · v7</div>
+  <h2>What you'll learn tonight</h2>
+  <ol class="obj">
+    <li><span class="tag">THE CHOICE</span>Agent or workflow: who chooses the next step, and how to defend the choice for a real process.</li>
+    <li><span class="tag">STATE</span>A graph's state, a node that returns only what it changed, and the <strong>reducer</strong> a shared key needs. You'll see the crash first.</li>
+    <li><span class="tag">WIRING</span>Nodes, edges, <code>compile</code>, <code>stream</code>; routers and <code>Command</code>, and when to use each.</li>
+    <li><span class="tag">THE BOX</span>The agent loop built by hand, <code>create_agent</code> printed as the graph it always was, and LangGraph Studio once.</li>
+    <li><span class="tag">PATTERNS</span>Chaining with a gate, and routing to desks that physically lack the wrong tools.</li>
+    <li><span class="tag">FAN OUT</span><strong>RAG-Fusion</strong> as parallel fan-out with reciprocal-rank fusion; orchestrator-worker with <code>Send</code>.</li>
+    <li><span class="tag">LOOP</span><strong>Corrective RAG</strong>: grade, rewrite, retry, with a cap in state.</li>
+    <li><span class="tag">MEASURED</span>Five arms on the scorecard, with calls per question. Only what moves the number ships on.</li>
+  </ol>
+</section>
+
+
+<!-- ═══ 4 · THE NIGHT ON ONE PAGE ═══════════════════════════════════════════ -->
+<section class="slide" data-title="The night on one page" data-mins="1–2"
+  data-notes="Walk the plate: A = notebook sections 4 to 10, B = sections 11 to 16, then section 17 builds v7. The bottom band is the line to repeat all night. Come back here at the close and tick it off.">
+  <div class="kicker">Session 10 · the map</div>
+  <h2 style="margin-bottom:8px">The night on one page</h2>
+  <figure class="mapfig">
+    <img src="../figures/session-map.png" alt="Session 10 on one page: v6 is one agent that picks its own steps, v7 is an inbox graph with order in the edges. A, the graph model: agent or workflow, state and reducers, nodes and edges, routers and Command, the agent loop by hand. B, five workflow patterns: chaining with a gate, routing to scoped desks, RAG-Fusion, orchestrator-worker with Send, corrective RAG. A step that must always happen belongs in an edge, not in a prompt.">
+    <figcaption>The same plate opens <code>session-10.ipynb</code>.</figcaption>
+  </figure>
+</section>
+
+
+<!-- ═══ 5 · WHERE TONIGHT FITS ═════════════════════════════════════════════ -->
+<section class="slide" data-title="Where tonight fits" data-mins="1">
+  <div class="kicker">Session 10 · the whole build</div>
+  <h2>Where tonight fits</h2>
+  <div class="grid g4">
+    <div class="card"><div class="t">Session 9 · v6</div><div class="d">cited answers, honest refusals, a scorecard; one agent chooses every step</div></div>
+    <div class="card accent"><div class="t">Tonight · v7</div><div class="d"><strong>the inbox as a graph: triage → split → desks → compose, and a policy desk that can grade its own retrieval</strong></div></div>
+    <div class="card"><div class="t">Session 11 · v8</div><div class="d">the graph pauses for a person, survives a restart, and remembers the customer; the chat moves onto it</div></div>
+    <div class="card"><div class="t">Session 12 · v9</div><div class="d">a supervisor of specialists over two knowledge sources, tools served over MCP</div></div>
+  </div>
+  <div class="grid g3" style="margin-top:14px">
+    <div class="card cyan"><div class="t">Every session from here</div><div class="d"><code>kb/RAG-DECISIONS.md</code> gets a row per technique, with its cost</div></div>
+    <div class="card cyan"><div class="t">Session 13–14</div><div class="d"><code>build_inbox()</code> behind a FastAPI endpoint</div></div>
+    <div class="card cyan"><div class="t">[ADV] tonight</div><div class="d">the Shop Owner's Daily Brief, part 1: a parallel workflow</div></div>
+  </div>
+  <p style="margin-top:14px">Answers on OpenRouter, embeddings on Gemini's free tier, as in sessions 8 and 9. <code>chat.py</code> stays on v6 until session 11, on purpose.</p>
+</section>
+
+
+<!-- ═══ 6 · WHERE THIS SHOWS UP AT WORK ═════════════════════════════════════ -->
+<section class="slide" data-title="Where this shows up at work" data-mins="2"
+  data-notes="The 'why should I care' slide. Each row is something a junior AI engineer gets asked; the right column is where the notebook covers it. Promise, don't teach.">
+  <div class="kicker">Session 10 · in industry</div>
+  <h2>Where this shows up at work</h2>
+  <table class="work">
+    <tr><th>The situation</th><th>What you'll be able to do</th><th>Notebook section</th></tr>
+    <tr><td>“Should this be an agent?”</td><td>Answer with a decision table, not a vibe: who should choose the next step, and why.</td><td class="sec">4</td></tr>
+    <tr><td>“Compliance needs proof it always checks eligibility first.”</td><td>Put the step in an edge, run it in code, and show the graph as the proof.</td><td class="sec">5, 15</td></tr>
+    <tr><td>“Two steps randomly overwrite each other's output.”</td><td>Recognise a missing reducer from the error, and choose the right one.</td><td class="sec">6</td></tr>
+    <tr><td>“The billing bot answered a shipping question.”</td><td>Route to desks that physically lack the wrong tools.</td><td class="sec">12</td></tr>
+    <tr><td>“Search misses when customers use different words.”</td><td>RAG-Fusion with reciprocal-rank fusion, or HyDE, and know what each costs.</td><td class="sec">13</td></tr>
+    <tr><td>“Customers send one email about four problems.”</td><td>Split it, fan out one worker per issue with <code>Send</code>, compose one reply.</td><td class="sec">14</td></tr>
+    <tr><td>“Let's add a self-correcting loop.”</td><td>Build it with a cap, measure it, and ship it off if the number doesn't move.</td><td class="sec">15, 16</td></tr>
+  </table>
+</section>
+
+
+<!-- ═══ 7 · THE FIVE PATTERNS CHEAT SHEET ═══════════════════════════════════ -->
+<section class="slide" data-title="Cheat sheet: five patterns" data-mins="1"
+  data-notes="The one artifact from tonight worth printing. Leave it up during Part B. Before each pattern, have the room name which row it is from the ShopWise problem alone.">
+  <div class="kicker">Session 10 · keep this one</div>
+  <h2>Five workflow patterns</h2>
+  <table class="work">
+    <tr><th>Pattern</th><th>Use it when</th><th>ShopWise</th><th>The detail that matters</th></tr>
+    <tr><td><strong>Chaining + gate</strong></td><td>a task splits into steps you can check</td><td>draft → tone check → revise once</td><td>the checker returns structure; the gate has a cap</td></tr>
+    <tr><td><strong>Routing</strong></td><td>different inputs need different tools</td><td>category → desk</td><td>a dict router costs zero calls</td></tr>
+    <tr><td><strong>Parallel</strong></td><td>steps don't depend on each other</td><td>RAG-Fusion: 4 searches, one step</td><td>a shared key needs a reducer</td></tr>
+    <tr><td><strong>Orchestrator-worker</strong></td><td>how many workers is known only at run time</td><td>split → <code>Send</code> × N desks</td><td>a worker sees only its payload</td></tr>
+    <tr><td><strong>Evaluator-optimizer</strong></td><td>output can be graded and retried</td><td>corrective RAG</td><td>the retry cap lives in state</td></tr>
+  </table>
+  <figure class="mapfig" style="margin-top:12px">
+    <img src="../figures/five-patterns.png" alt="The five workflow patterns, each a small diagram with its ShopWise use: chaining with a gate, routing to desks, RAG-Fusion as parallel fan-out, orchestrator-worker with Send, corrective RAG as evaluator-optimizer." style="max-height:34vh">
+  </figure>
+</section>
+
+
+<!-- ═══ 8 · WHAT YOU'LL LEAVE WITH ══════════════════════════════════════════ -->
+<section class="slide" data-title="What you'll leave with" data-mins="1">
+  <div class="kicker">Session 10 · v6 → v7</div>
+  <h2>What you'll leave with</h2>
+  <div class="leave">
+    <figure class="mapfig">
+      <img src="../figures/v7-architecture.png" alt="The v7 architecture: inbox.py turns the ticket's sender into the Customer context; triage, then split, then Send to four desks: orders, billing and general are small agents with read-only tools, policy fetches order facts in code then calls the policy graph with fusion and grading as switches; compose writes one reply. chat.py and agent.py are unchanged v6; nothing can issue a refund.">
+      <figcaption>Graph on top, agents inside nodes, order in the edges.</figcaption>
+    </figure>
+    <div>
+      <div class="card accent">
+        <div class="t">Have these ready</div>
+        <ul class="keys">
+          <li><strong>The knowledge base</strong> from session 8<br><code>uv run python kb/ingest.py</code> if <code>labs/.state/qdrant</code> is empty</li>
+          <li><strong>OpenRouter</strong> key for answers, <strong>Gemini</strong> key for every search</li>
+          <li><strong>LangSmith</strong> login for the Studio demo (section 10)</li>
+          <li>A budget: the scorecard (section 16) costs ~200 calls; it has a <code>LIMIT</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="switch"><b>→ Switch to the notebook:</b> <code>labs/session-10/session-10.ipynb</code> — one return question, asked three times.</div>
+</section>
+
+
+</div><!-- /deck -->
+
+<div class="zone l" id="zl" title="previous"></div>
+<div class="zone r" id="zr" title="next"></div>
+
+<div class="notes" id="notes"></div>
+
+<div class="foot">
+  <div class="brand">Grow with Data · Session 10</div>
+  <div class="mid"><span id="cur">1</span> / <span id="tot">8</span> · <span id="ttl"></span></div>
+  <div><kbd>←</kbd> <kbd>→</kbd> move · <kbd>o</kbd> overview · <kbd>n</kbd> notes · <kbd>?</kbd> help</div>
+</div>
+
+<div class="overlay" id="ov">
+  <h4>Slides — click to jump</h4>
+  <div class="ovgrid" id="ovgrid"></div>
+  <div class="keys">
+    <kbd>→</kbd> / <kbd>space</kbd> next · <kbd>←</kbd> previous · <kbd>Home</kbd> / <kbd>End</kbd> first / last<br>
+    <kbd>o</kbd> this overview · <kbd>n</kbd> presenter notes with timings · <kbd>f</kbd> fullscreen ·
+    <kbd>Esc</kbd> close<br>
+    <kbd>Cmd/Ctrl-P</kbd> print — one slide per page, for a PDF handout
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const prog = document.getElementById("prog");
+  const notes = document.getElementById("notes");
+  const ov = document.getElementById("ov");
+  const ovgrid = document.getElementById("ovgrid");
+  let i = 0;
+  let showNotes = false;
+
+  document.getElementById("tot").textContent = slides.length;
+
+  // Overview thumbnails
+  slides.forEach((s, n) => {
+    const d = document.createElement("div");
+    d.className = "ov";
+    d.innerHTML = '<div class="n">' + (n + 1) + "</div><div class=\"t\"></div>";
+    d.querySelector(".t").textContent = s.dataset.title || "";
+    d.addEventListener("click", () => { go(n); closeOv(); });
+    ovgrid.appendChild(d);
+  });
+  const thumbs = Array.from(ovgrid.children);
+
+  function render() {
+    slides.forEach((s, n) => s.classList.toggle("on", n === i));
+    thumbs.forEach((t, n) => t.classList.toggle("cur", n === i));
+    prog.style.width = ((i + 1) / slides.length) * 100 + "%";
+    document.getElementById("cur").textContent = i + 1;
+    document.getElementById("ttl").textContent = slides[i].dataset.title || "";
+
+    const mins = slides[i].dataset.mins;
+    const text = slides[i].dataset.notes || "—";
+    notes.innerHTML = (mins ? '<span class="mins">' + mins + " min</span>" : "") +
+                      "<b>Presenter:</b> " + text;
+    notes.classList.toggle("on", showNotes);
+
+    if (history.replaceState) history.replaceState(null, "", "#" + (i + 1));
+    slides[i].scrollTop = 0;
+  }
+
+  function go(n) { i = Math.max(0, Math.min(slides.length - 1, n)); render(); }
+  function next() { go(i + 1); }
+  function prev() { go(i - 1); }
+  function closeOv() { ov.classList.remove("on"); }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;      // leave Cmd-P etc. alone
+    switch (e.key) {
+      case "ArrowRight": case " ": case "PageDown": next(); e.preventDefault(); break;
+      case "ArrowLeft":  case "PageUp": prev(); e.preventDefault(); break;
+      case "Home": go(0); break;
+      case "End":  go(slides.length - 1); break;
+      case "o": case "O": ov.classList.toggle("on"); break;
+      case "?": ov.classList.add("on"); break;
+      case "Escape": closeOv(); break;
+      case "n": case "N": showNotes = !showNotes; render(); break;
+      case "f": case "F":
+        if (document.fullscreenElement) document.exitFullscreen();
+        else document.documentElement.requestFullscreen();
+        break;
+    }
+  });
+
+  document.getElementById("zr").addEventListener("click", next);
+  document.getElementById("zl").addEventListener("click", prev);
+
+  // Deep link: #7 opens slide 7, so a reload lands where you left off.
+  const start = parseInt((location.hash || "").slice(1), 10);
+  go(Number.isFinite(start) && start > 0 ? start - 1 : 0);
+})();
+</script>
+</body>
+</html>

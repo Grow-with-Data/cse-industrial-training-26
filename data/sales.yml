@@ -1,0 +1,480 @@
+# Sales — fourteen days of order lines, for the [ADV] Daily Brief (session 10).
+#
+# The order fixture in backend.yml has four orders, which is enough for support
+# questions and nowhere near enough for "yesterday's sales". These lines are the
+# shop's till roll for 24 July to 6 August 2026: one entry per product per
+# order, generated once with a fixed seed and committed, so every participant's
+# brief sums the same numbers.
+#
+# Grouped by PRODUCT TYPE, never "category": category is the word for what a
+# TICKET is about (CONTEXT.md). backend.yml's products carry product_type, and
+# the brief joins on sku to read it.
+#
+# Deliberate: SKU-300 (the kettle) stops selling on 2 August, the day its stock
+# hit zero in backend.yml. A brief that notices a best-seller went silent is
+# worth more than one that only adds up.
+#
+# Fields: id (SALE-nnnn) · date (quoted, see backend.yml for why) · sku (a key
+# in backend.yml products) · qty · unit_price (the price on that day).
+
+- id: SALE-0001
+  date: "2026-07-24"
+  sku: SKU-100
+  qty: 1
+  unit_price: 129.00
+
+- id: SALE-0002
+  date: "2026-07-24"
+  sku: SKU-300
+  qty: 1
+  unit_price: 49.00
+
+- id: SALE-0003
+  date: "2026-07-24"
+  sku: SKU-400
+  qty: 1
+  unit_price: 79.00
+
+- id: SALE-0004
+  date: "2026-07-25"
+  sku: SKU-200
+  qty: 1
+  unit_price: 199.00
+
+- id: SALE-0005
+  date: "2026-07-25"
+  sku: SKU-200
+  qty: 1
+  unit_price: 199.00
+
+- id: SALE-0006
+  date: "2026-07-25"
+  sku: SKU-300
+  qty: 1
+  unit_price: 49.00
+
+- id: SALE-0007
+  date: "2026-07-25"
+  sku: SKU-300
+  qty: 1
+  unit_price: 49.00
+
+- id: SALE-0008
+  date: "2026-07-25"
+  sku: SKU-300
+  qty: 2
+  unit_price: 49.00
+
+- id: SALE-0009
+  date: "2026-07-25"
+  sku: SKU-300
+  qty: 1
+  unit_price: 49.00
+
+- id: SALE-0010
+  date: "2026-07-25"
+  sku: SKU-300
+  qty: 1
+  unit_price: 49.00
+
+- id: SALE-0011
+  date: "2026-07-25"
+  sku: SKU-300
+  qty: 1
+  unit_price: 49.00
+
+- id: SALE-0012
+  date: "2026-07-25"
+  sku: SKU-100
+  qty: 1
+  unit_price: 129.00
+
+- id: SALE-0013
+  date: "2026-07-25"
+  sku: SKU-400
+  qty: 1
+  unit_price: 79.00
+
+- id: SALE-0014
+  date: "2026-07-26"
+  sku: SKU-200
+  qty: 2
+  unit_price: 199.00
+
+- id: SALE-0015
+  date: "2026-07-26"
+  sku: SKU-100
+  qty: 1
+  unit_price: 129.00
+
+- id: SALE-0016
+  date: "2026-07-26"
+  sku: SKU-100
+  qty: 1
+  unit_price: 129.00
+
+- id: SALE-0017
+  date: "2026-07-26"
+  sku: SKU-400
+  qty: 1
+  unit_price: 79.00
+
+- id: SALE-0018
+  date: "2026-07-26"
+  sku: SKU-300
+  qty: 2
+  unit_price: 49.00
+
+- id: SALE-0019
+  date: "2026-07-26"
+  sku: SKU-300
+  qty: 1
+  unit_price: 49.00
+
+- id: SALE-0020
+  date: "2026-07-26"
+  sku: SKU-200
+  qty: 1
+  unit_price: 199.00
+
+- id: SALE-0021
+  date: "2026-07-26"
+  sku: SKU-300
+  qty: 1
+  unit_price: 49.00
+
+- id: SALE-0022
+  date: "2026-07-26"
+  sku: SKU-100
+  qty: 1
+  unit_price: 129.00
+
+- id: SALE-0023
+  date: "2026-07-26"
+  sku: SKU-300
+  qty: 1
+  unit_price: 49.00
+
+- id: SALE-0024
+  date: "2026-07-26"
+  sku: SKU-200
+  qty: 1
+  unit_price: 199.00
+
+- id: SALE-0025
+  date: "2026-07-27"
+  sku: SKU-300
+  qty: 1
+  unit_price: 49.00
+
+- id: SALE-0026
+  date: "2026-07-27"
+  sku: SKU-400
+  qty: 1
+  unit_price: 79.00
+
+- id: SALE-0027
+  date: "2026-07-27"
+  sku: SKU-300
+  qty: 1
+  unit_price: 49.00
+
+- id: SALE-0028
+  date: "2026-07-27"
+  sku: SKU-300
+  qty: 1
+  unit_price: 49.00
+
+- id: SALE-0029
+  date: "2026-07-27"
+  sku: SKU-400
+  qty: 1
+  unit_price: 79.00
+
+- id: SALE-0030
+  date: "2026-07-28"
+  sku: SKU-100
+  qty: 1
+  unit_price: 129.00
+
+- id: SALE-0031
+  date: "2026-07-28"
+  sku: SKU-200
+  qty: 1
+  unit_price: 199.00
+
+- id: SALE-0032
+  date: "2026-07-28"
+  sku: SKU-100
+  qty: 1
+  unit_price: 129.00
+
+- id: SALE-0033
+  date: "2026-07-28"
+  sku: SKU-300
+  qty: 1
+  unit_price: 49.00
+
+- id: SALE-0034
+  date: "2026-07-28"
+  sku: SKU-200
+  qty: 1
+  unit_price: 199.00
+
+- id: SALE-0035
+  date: "2026-07-28"
+  sku: SKU-400
+  qty: 1
+  unit_price: 79.00
+
+- id: SALE-0036
+  date: "2026-07-28"
+  sku: SKU-200
+  qty: 1
+  unit_price: 199.00
+
+- id: SALE-0037
+  date: "2026-07-28"
+  sku: SKU-100
+  qty: 1
+  unit_price: 129.00
+
+- id: SALE-0038
+  date: "2026-07-29"
+  sku: SKU-300
+  qty: 1
+  unit_price: 49.00
+
+- id: SALE-0039
+  date: "2026-07-29"
+  sku: SKU-200
+  qty: 1
+  unit_price: 199.00
+
+- id: SALE-0040
+  date: "2026-07-29"
+  sku: SKU-300
+  qty: 2
+  unit_price: 49.00
+
+- id: SALE-0041
+  date: "2026-07-29"
+  sku: SKU-100
+  qty: 1
+  unit_price: 129.00
+
+- id: SALE-0042
+  date: "2026-07-29"
+  sku: SKU-400
+  qty: 1
+  unit_price: 79.00
+
+- id: SALE-0043
+  date: "2026-07-29"
+  sku: SKU-400
+  qty: 1
+  unit_price: 79.00
+
+- id: SALE-0044
+  date: "2026-07-29"
+  sku: SKU-100
+  qty: 1
+  unit_price: 129.00
+
+- id: SALE-0045
+  date: "2026-07-30"
+  sku: SKU-200
+  qty: 1
+  unit_price: 199.00
+
+- id: SALE-0046
+  date: "2026-07-30"
+  sku: SKU-300
+  qty: 1
+  unit_price: 49.00
+
+- id: SALE-0047
+  date: "2026-07-30"
+  sku: SKU-400
+  qty: 1
+  unit_price: 79.00
+
+- id: SALE-0048
+  date: "2026-07-30"
+  sku: SKU-100
+  qty: 1
+  unit_price: 129.00
+
+- id: SALE-0049
+  date: "2026-07-30"
+  sku: SKU-100
+  qty: 1
+  unit_price: 129.00
+
+- id: SALE-0050
+  date: "2026-07-30"
+  sku: SKU-300
+  qty: 1
+  unit_price: 49.00
+
+- id: SALE-0051
+  date: "2026-07-31"
+  sku: SKU-400
+  qty: 1
+  unit_price: 79.00
+
+- id: SALE-0052
+  date: "2026-07-31"
+  sku: SKU-200
+  qty: 1
+  unit_price: 199.00
+
+- id: SALE-0053
+  date: "2026-07-31"
+  sku: SKU-400
+  qty: 1
+  unit_price: 79.00
+
+- id: SALE-0054
+  date: "2026-07-31"
+  sku: SKU-400
+  qty: 1
+  unit_price: 79.00
+
+- id: SALE-0055
+  date: "2026-07-31"
+  sku: SKU-100
+  qty: 1
+  unit_price: 129.00
+
+- id: SALE-0056
+  date: "2026-07-31"
+  sku: SKU-100
+  qty: 1
+  unit_price: 129.00
+
+- id: SALE-0057
+  date: "2026-08-01"
+  sku: SKU-100
+  qty: 1
+  unit_price: 129.00
+
+- id: SALE-0058
+  date: "2026-08-01"
+  sku: SKU-400
+  qty: 2
+  unit_price: 79.00
+
+- id: SALE-0059
+  date: "2026-08-01"
+  sku: SKU-300
+  qty: 1
+  unit_price: 49.00
+
+- id: SALE-0060
+  date: "2026-08-01"
+  sku: SKU-300
+  qty: 1
+  unit_price: 49.00
+
+- id: SALE-0061
+  date: "2026-08-01"
+  sku: SKU-400
+  qty: 1
+  unit_price: 79.00
+
+- id: SALE-0062
+  date: "2026-08-01"
+  sku: SKU-300
+  qty: 1
+  unit_price: 49.00
+
+- id: SALE-0063
+  date: "2026-08-02"
+  sku: SKU-400
+  qty: 1
+  unit_price: 79.00
+
+- id: SALE-0064
+  date: "2026-08-02"
+  sku: SKU-400
+  qty: 1
+  unit_price: 79.00
+
+- id: SALE-0065
+  date: "2026-08-02"
+  sku: SKU-200
+  qty: 2
+  unit_price: 199.00
+
+- id: SALE-0066
+  date: "2026-08-03"
+  sku: SKU-100
+  qty: 1
+  unit_price: 129.00
+
+- id: SALE-0067
+  date: "2026-08-03"
+  sku: SKU-400
+  qty: 1
+  unit_price: 79.00
+
+- id: SALE-0068
+  date: "2026-08-03"
+  sku: SKU-400
+  qty: 1
+  unit_price: 79.00
+
+- id: SALE-0069
+  date: "2026-08-03"
+  sku: SKU-200
+  qty: 1
+  unit_price: 199.00
+
+- id: SALE-0070
+  date: "2026-08-03"
+  sku: SKU-200
+  qty: 1
+  unit_price: 199.00
+
+- id: SALE-0071
+  date: "2026-08-04"
+  sku: SKU-400
+  qty: 1
+  unit_price: 79.00
+
+- id: SALE-0072
+  date: "2026-08-04"
+  sku: SKU-100
+  qty: 1
+  unit_price: 129.00
+
+- id: SALE-0073
+  date: "2026-08-05"
+  sku: SKU-100
+  qty: 1
+  unit_price: 129.00
+
+- id: SALE-0074
+  date: "2026-08-05"
+  sku: SKU-200
+  qty: 1
+  unit_price: 199.00
+
+- id: SALE-0075
+  date: "2026-08-06"
+  sku: SKU-400
+  qty: 1
+  unit_price: 79.00
+
+- id: SALE-0076
+  date: "2026-08-06"
+  sku: SKU-100
+  qty: 1
+  unit_price: 129.00
+
+- id: SALE-0077
+  date: "2026-08-06"
+  sku: SKU-200
+  qty: 1
+  unit_price: 199.00

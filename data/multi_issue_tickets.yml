@@ -1,0 +1,142 @@
+# Multi-issue tickets — one email, several unrelated things wrong (session 10).
+#
+# KEPT APART FROM tickets.yml ON PURPOSE (ADR-0013)
+#   tickets.yml is the triage ground truth: twenty tickets, one hand-labelled
+#   category each, and every committed triage score from session 3 on is a
+#   number out of twenty. A ticket about a late order AND a refund AND a
+#   warranty has no single right category, so adding one there would change the
+#   denominator and break the label convention at once. These live here instead.
+#
+# WHAT THEY ARE FOR
+#   Session 10's `split` node turns a ticket into sub-issues and `Send` gives
+#   each one to a desk. One demo ticket would prove nothing about a fan-out whose
+#   width is decided at run time, so there are four: two, two, three and four
+#   sub-issues, and TCK-M02 sends both of its sub-issues to the SAME desk.
+#
+# Fields are tickets.yml's, plus:
+#   desks     the desk each sub-issue should reach, in the order raised — the
+#             ground truth the notebook checks the split against. Desks, not
+#             categories, because "where is my parcel" is fairly order_status OR
+#             shipping and both land on the orders desk; the desk is what decides
+#             the answer.
+#   hook      why this ticket exists. Keep it true if you edit the body.
+#
+# SESSION 11 ADDS FIVE (TCK-M05 to M09)
+#   Not all multi-issue: they are the stories v8's pause, memory and time travel
+#   are taught on, and they live here for the same reason as the first four —
+#   tickets.yml's twenty are a scored set, and nothing may change its score.
+#     M05, M06   refunds: one a Reviewer approves or edits, one outside the window
+#     M07, M08   one customer, a week apart: the first says how he wants to be
+#                treated, the second is the lost parcel where that should show
+#     M09        a ticket split can fairly get wrong, for the time-travel fork
+#
+# Ids are TCK-Mnn so they can never collide with tickets.yml's TCK-0nn.
+# verify.py checks every sender, order, refund and SKU named below exists in
+# backend.yml, exactly as it does for tickets.yml.
+
+- id: TCK-M01
+  subject: "three things, sorry"
+  body: >-
+    Hi, a few things. My two BrewMaster kettles (ORD-5002) still say processing
+    after more than a week, when will they actually ship? Separately, I asked for
+    a refund on the crackling headphones a week ago (REF-9001) and have heard
+    nothing, has it gone through? And if one of the kettles breaks later on, how
+    long is the warranty on it?
+  from: ayesha@example.com
+  received: "2026-08-09"
+  desks: [orders, billing, policy]
+  hook: the session's opening ticket — three desks, one reply
+
+- id: TCK-M02
+  subject: "backpack zip"
+  body: >-
+    The zip on my TrailPack 30L (order ORD-5004) has started separating. Can I
+    still return it? If not, is it covered by any warranty?
+  from: priya@example.com
+  received: "2026-08-10"
+  desks: [policy, policy]
+  hook: two sub-issues for the SAME desk, run in parallel; both answers are no
+    (outside the 30-day window, and SKU-400 has no warranty)
+
+- id: TCK-M03
+  subject: "my watch, and my friend's refund"
+  body: >-
+    Where is my PulseFit watch? Order ORD-5003, the tracking has not moved since
+    Monday. Also my friend Ayesha asked me to check on her headphones refund for
+    ORD-5001, can you tell me if it was paid?
+  from: tanvir@example.com
+  received: "2026-08-07"
+  desks: [orders, billing]
+  hook: the second sub-issue is about another customer's order — v4's
+    authorize rail must still refuse it inside the graph
+
+- id: TCK-M04
+  subject: "several questions about ORD-5003"
+  body: >-
+    Four quick ones. The tracking for ORD-5003 has been stuck for three days, is
+    the parcel lost? How long is the warranty on the PulseFit smartwatch? Is the
+    BrewMaster kettle back in stock, I want to buy one as a gift. And my card
+    statement shows two charges of $199 for ORD-5003, can you check?
+  from: tanvir@example.com
+  received: "2026-08-07"
+  desks: [orders, policy, general, billing]
+  hook: four sub-issues, four different desks — the widest fan-out
+
+- id: TCK-M05
+  subject: "headphones refund"
+  body: >-
+    Hi, I asked for a refund on my AeroSound headphones from ORD-5001 a week ago
+    (REF-9001) because the left earcup crackles. Can you please put it through?
+  from: ayesha@example.com
+  received: "2026-08-09"
+  desks: [billing]
+  hook: session 11's refund — an open request inside the return window, so the
+    billing desk proposes it and a Reviewer approves, edits or rejects
+
+- id: TCK-M06
+  subject: "refund for the backpack"
+  body: >-
+    I would like my money back for the TrailPack 30L backpack, order ORD-5004.
+    The zip is separating and I have barely used it.
+  from: priya@example.com
+  received: "2026-08-10"
+  desks: [billing]
+  hook: months outside the return window — still a proposal, with reject
+    recommended, because an exception is a person's call (ADR-0016)
+
+- id: TCK-M07
+  subject: "where is my watch"
+  body: >-
+    The tracking for my PulseFit watch (ORD-5003) has not moved for a few days.
+    Is it on its way? One request: if anything is ever wrong with something I
+    order, I would much rather have a replacement than my money back. And please
+    don't phone me, I can't take calls at work. Email is fine.
+  from: tanvir@example.com
+  received: "2026-08-07"
+  desks: [orders]
+  hook: states two lasting preferences — the remember node should keep both
+
+- id: TCK-M08
+  subject: "watch still not here"
+  body: >-
+    It has now been more than a week and the tracking for my PulseFit watch
+    (ORD-5003) still has not moved at all. I think it is lost. What are my
+    options?
+  from: tanvir@example.com
+  received: "2026-08-14"
+  desks: [orders]
+  hook: a week after TCK-M07 — a lost parcel gets "a replacement or a refund, at
+    your choice" (shipping-policy 4.2), and Tanvir already told us his choice
+
+- id: TCK-M09
+  subject: "headphones died"
+  body: >-
+    My AeroSound headphones from ORD-5001 stopped working completely after a few
+    weeks. I just want my money back.
+  from: ayesha@example.com
+  received: "2026-08-12"
+  desks: [policy]
+  hook: the words say refund, the policy says warranty — a fault in normal use is
+    a warranty claim (returns-policy 2.3), and the headphones are in stock, so a
+    replacement comes first. split tends to file it as refund; the time-travel
+    fork corrects it and runs forward
