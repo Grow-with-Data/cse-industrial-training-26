@@ -56,6 +56,12 @@ dependencies = [
     # that plug into LangSmith experiments.
     "openevals>=0.2",
 
+    # --- from S11: pause, resume, remember ---
+    # SqliteSaver keeps every ticket's checkpoints in .state/checkpoints.sqlite, and
+    # SqliteStore keeps what the assistant remembers about each customer, searchable
+    # by meaning through the sqlite-vec extension it brings along.
+    "langgraph-checkpoint-sqlite>=3.1,<4",
+
     # --- from S13: serving ---
     "fastapi>=0.141.1",
     "uvicorn[standard]>=0.52",
