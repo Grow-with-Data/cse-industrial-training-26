@@ -1,0 +1,287 @@
+# past_tickets.yml — how ShopWise's support team closed its tickets (new in v9).
+#
+# THE SECOND SOURCE
+#   The policy collection says what the RULES are. It cannot say what the team
+#   actually DID when Tanvir's strap snapped or Kamal was charged twice. This file
+#   can: kb/ingest.py turns each entry into one document in the `tickets__...`
+#   collection, and the knowledge specialist searches it with search_past_tickets.
+#
+#   A past ticket is PRECEDENT, never policy. The reply cites one as "a similar
+#   case (TCK-H01)", never in the [source · section] form a rule uses, and never
+#   promises the same outcome: the warranty team decided that case, not a rule.
+#
+# WHAT IS IN IT
+#   Resolutions for the twenty inbox tickets in labs/data/tickets.yml, which are
+#   all closed by now (ingest joins each one to its subject, body and category
+#   there), and seven tickets closed earlier this year, TCK-H01 to H07, which
+#   carry their own subject, body and category. Kept in the project, not in data/,
+#   because data/ is shared course-wide and the resolutions belong to this
+#   snapshot's knowledge base.
+#
+# WHAT IS DELIBERATELY NOT IN IT
+#   Who wrote. kb/ingest.py drops `from` before anything is embedded. A past
+#   ticket is shown to OTHER customers as precedent, so it must never carry a
+#   name, an email or an order id that leads back to a person. Resolutions say
+#   "the customer", never a name, and no order ids appear in them.
+#
+# Fields
+#   id            TCK-0NN (joins tickets.yml) or TCK-H0N (self-contained)
+#   product_type  backend.yml's vocabulary: audio · wearables · home · outdoor,
+#                 or none. The self-query filter matches on it.
+#   closed        when the ticket was closed
+#   resolution    what the team found and did, in plain past tense
+#   subject, body, category   TCK-H tickets only; TCK-0NN take them from tickets.yml
+
+- id: TCK-001
+  product_type: audio
+  closed: "2026-08-03"
+  resolution: >-
+    The order showed delivered several days before the customer wrote. The carrier's
+    proof of delivery named a neighbour, and the customer found the parcel there.
+    Closed with an apology for the confusing tracking page.
+
+- id: TCK-002
+  product_type: audio
+  closed: "2026-08-12"
+  resolution: >-
+    A crackling earcup on AeroSound Pro headphones nine days after delivery, opened.
+    Inside the 15-day window for opened audio, so the returns team approved a return
+    and refunded the full price to the original payment method after the headphones
+    reached the warehouse. The customer had asked for a refund rather than a replacement.
+
+- id: TCK-003
+  product_type: home
+  closed: "2026-08-07"
+  resolution: >-
+    Two kettles stuck in processing because the item went out of stock after the order
+    was placed. Under shipping-policy 4.1 the customer was offered the choice of waiting
+    for a revised date or cancelling for a full refund. A supervisor replied the same
+    day and apologised for the two unanswered emails.
+
+- id: TCK-004
+  product_type: wearables
+  closed: "2026-08-08"
+  resolution: >-
+    A smartwatch in transit with the carrier, tracking last updated two days earlier.
+    Replied in Bangla with the carrier, tracking id and estimated arrival. The parcel
+    arrived on the estimated date.
+
+- id: TCK-005
+  product_type: outdoor
+  closed: "2026-08-06"
+  resolution: >-
+    A backpack zip separating three months after delivery. Outside the 30-day return
+    window, and outdoor products carry no ShopWise warranty, so neither a return nor a
+    warranty claim was possible. The team explained both rules kindly and pointed the
+    customer to the manufacturer.
+
+- id: TCK-006
+  product_type: outdoor
+  closed: "2026-08-06"
+  resolution: >-
+    Confirmed that outdoor products, the TrailPack backpack included, carry no ShopWise
+    warranty, and that faults within 30 days of delivery can still be raised under the
+    returns policy.
+
+- id: TCK-007
+  product_type: audio
+  closed: "2026-08-12"
+  resolution: >-
+    A refund still showing "requested". Explained that refunds are paid 5 to 7 business
+    days after the returned item reaches the warehouse, and that the returns team
+    confirms by email. It was paid on day six.
+
+- id: TCK-008
+  product_type: home
+  closed: "2026-08-09"
+  resolution: >-
+    The BrewMaster kettle was out of stock with no confirmed restock date. The team did
+    not guess one: it offered to email the customer when stock returned, and did so.
+
+- id: TCK-009
+  product_type: audio
+  closed: "2026-08-10"
+  resolution: >-
+    Two identical charges on the same day for one order. The billing team found the
+    second was a payment authorisation that had not been released, not a second
+    charge. It dropped off the card within three business days; nothing needed
+    refunding. The customer was told what an authorisation hold is.
+
+- id: TCK-010
+  product_type: audio
+  closed: "2026-08-04"
+  resolution: >-
+    A pre-sale question about iPhone compatibility and multipoint pairing. Answered from
+    the product page, with a link to the specifications.
+
+- id: TCK-011
+  product_type: wearables
+  closed: "2026-08-11"
+  resolution: >-
+    The wrong item delivered: a backpack instead of a smartwatch. Sent in error, so the
+    team sent the correct watch by express at no charge and a prepaid return label for
+    the backpack (returns-policy 3.2: items sent in error ship back free).
+
+- id: TCK-012
+  product_type: home
+  closed: "2026-08-05"
+  resolution: >-
+    A change of delivery address before dispatch. The order had not shipped, so the
+    address was changed. ShopWise ships within the United States only; the new address
+    was checked against that before the change.
+
+- id: TCK-013
+  product_type: wearables
+  closed: "2026-08-06"
+  resolution: >-
+    A VAT invoice addressed to the customer's employer. The billing team issued one on
+    request; no policy covers it, so it was handled as a one-off.
+
+- id: TCK-014
+  product_type: none
+  closed: "2026-08-07"
+  resolution: >-
+    A gold-tier customer charged for standard shipping. Gold tier includes free RETURN
+    shipping, not free delivery: standard delivery is free on orders of $75 or more for
+    everyone. The order was under $75, so the charge was correct, and this was explained.
+
+- id: TCK-015
+  product_type: wearables
+  closed: "2026-08-13"
+  resolution: >-
+    A smartwatch battery draining about 40% overnight two weeks after delivery. A reset
+    did not help, so it was treated as a fault in normal use under the 24-month
+    wearables warranty. The watch was in stock, so a replacement was sent first and
+    ShopWise paid shipping both ways.
+
+- id: TCK-016
+  product_type: home
+  closed: "2026-08-05"
+  resolution: >-
+    A cancellation before dispatch because the customer found the item cheaper
+    elsewhere. The order had not shipped, so it was cancelled and refunded in full.
+    ShopWise has no price-match policy, and the team did not invent one.
+
+- id: TCK-017
+  product_type: wearables
+  closed: "2026-08-15"
+  resolution: >-
+    Tracking had not updated for six days. Not yet lost under shipping-policy 4.2, which
+    needs 7 business days without an update; the team opened a trace with the carrier
+    and the parcel was found and delivered two days later.
+
+- id: TCK-018
+  product_type: home
+  closed: "2026-08-05"
+  resolution: >-
+    A question about voltage and plug type. Answered from the product page: ShopWise
+    ships within the United States only, and the kettle is sold with a US plug.
+
+- id: TCK-019
+  product_type: none
+  closed: "2026-08-06"
+  resolution: >-
+    An angry complaint about unanswered emails and a looping chat widget. A team lead
+    apologised personally, answered both earlier emails in the same reply, and logged
+    the widget loop as a bug.
+
+- id: TCK-020
+  product_type: none
+  closed: "2026-08-04"
+  resolution: >-
+    Removed from marketing emails; order notifications kept, as the customer asked.
+
+# ── Closed earlier this year ─────────────────────────────────────────────────
+
+- id: TCK-H01
+  subject: "watch strap snapped"
+  body: >-
+    The strap on my PulseFit smartwatch snapped at the buckle after about seven weeks
+    of normal wear. I haven't dropped it or pulled on it. Is this covered?
+  category: warranty
+  product_type: wearables
+  closed: "2026-04-22"
+  resolution: >-
+    Treated as a fault in materials under the 24-month wearables warranty: the strap is
+    part of the watch, and it failed in normal use. The customer sent a photo of the
+    buckle; the warranty team approved the claim within two working days and sent a
+    replacement strap, as straps were in stock. ShopWise paid the shipping.
+
+- id: TCK-H02
+  subject: "AeroSound earcup crackling"
+  body: >-
+    My AeroSound Pro headphones started crackling in the right earcup five months after
+    I bought them. It happens at any volume.
+  category: warranty
+  product_type: audio
+  closed: "2026-03-18"
+  resolution: >-
+    Outside the return window but inside the 12-month audio warranty. The customer sent
+    a short video of the crackle; the warranty team approved the claim and sent a
+    replacement pair first, since the headphones were in stock. ShopWise paid shipping
+    both ways.
+
+- id: TCK-H03
+  subject: "kettle base cracked"
+  body: >-
+    I dropped my BrewMaster kettle and the base cracked. It still heats but leaks a
+    little. Can you replace it under warranty?
+  category: warranty
+  product_type: home
+  closed: "2026-05-02"
+  resolution: >-
+    Declined: the warranty does not cover accidental damage such as drops
+    (warranty-policy 1.2). The team explained this kindly and advised the customer to
+    stop using a leaking kettle for safety.
+
+- id: TCK-H04
+  subject: "backpack strap tore"
+  body: >-
+    A shoulder strap on my TrailPack 30L tore at the seam after three weeks of light use.
+  category: return
+  product_type: outdoor
+  closed: "2026-06-09"
+  resolution: >-
+    Outdoor products have no warranty, but the fault appeared within 30 days of
+    delivery, so it was handled under the returns policy (warranty-policy 2.2). The
+    returns team approved the return as an item that arrived faulty, so return shipping
+    was free, and refunded the price once the backpack reached the warehouse.
+
+- id: TCK-H05
+  subject: "parcel stuck for a week and a half"
+  body: >-
+    My tracking hasn't changed in eight business days. Is my parcel lost? I'd rather have
+    the item than my money back.
+  category: shipping
+  product_type: audio
+  closed: "2026-02-27"
+  resolution: >-
+    No tracking update for 8 business days, so the parcel was treated as lost under
+    shipping-policy 4.2. The customer chose a replacement over a refund, and the team
+    sent one by express at no charge.
+
+- id: TCK-H06
+  subject: "charged for return shipping as a gold member"
+  body: >-
+    I'm on the gold tier and I was charged $6.50 for the return label on my headphones.
+    I thought gold members get free returns?
+  category: billing
+  product_type: audio
+  closed: "2026-05-20"
+  resolution: >-
+    Gold-tier members receive free return shipping (returns-policy 3.2). The label had
+    been charged by mistake, so the $6.50 was refunded to the original payment method
+    and the customer was thanked for flagging it.
+
+- id: TCK-H07
+  subject: "fitness band screen scratched"
+  body: >-
+    The screen on my smartwatch has a deep scratch from a door frame. Will the warranty
+    replace the screen?
+  category: warranty
+  product_type: wearables
+  closed: "2026-06-30"
+  resolution: >-
+    Declined: a scratch from knocking the watch is accidental damage, which the warranty
+    does not cover (warranty-policy 1.2). The team explained the difference between a
+    fault in normal use and accidental damage.

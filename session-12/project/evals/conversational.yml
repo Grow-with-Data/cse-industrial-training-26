@@ -1,0 +1,110 @@
+# conversational.yml — follow-up questions for the knowledge base (new in v8).
+#
+# WHY A SECOND GOLD FILE
+#   data/kb_questions.yml asks every question cold. A real customer asks a
+#   question, reads the answer, and then asks "and for the watch?". That second
+#   question means nothing without the first, and a retriever that embeds it as
+#   written searches for "and for the watch?". kb_questions.yml could never catch
+#   this, because none of its questions has a conversation behind it.
+#
+#   Kept in the project, not in data/, because it scores one technique of this
+#   snapshot (kb/query.py) rather than describing the shop.
+#
+# SHAPE
+#   Each entry is one two-turn conversation. The scorer feeds `turn1` and
+#   `reply1` in as history and scores the answer to `followup`.
+#     turn1        the customer's first question
+#     reply1       the assistant's first answer, fixed here so the eval does not
+#                  pay to regenerate it on every run (and every run sees the same
+#                  history)
+#     followup     the second question, as a customer would actually type it
+#     standalone   what the follow-up MEANS, written by a person: the target the
+#                  rewrite node is aiming at. For reading, not for scoring.
+#     source, section, evidence, answerable, reference
+#                  kb_questions.yml's fields, for the FOLLOW-UP's answer, so
+#                  evals/run_eval.py scores these rows with the same functions.
+#
+# WHAT MAKES A GOOD PAIR
+#   The follow-up must be hard to retrieve on its own words. "What about a
+#   clearance item?" still says what it is about; "how do I claim it?" does not.
+#   KBF-05 and KBF-06 are the controls: their follow-ups carry enough words to
+#   retrieve alone, and the rewrite must not make them worse.
+
+- id: KBF-01
+  turn1: What's the return window for headphones?
+  reply1: >-
+    Opened headphones can be returned within 15 days of delivery, and unopened
+    ones within 30 days [returns-policy · 1. The return window].
+  followup: And for the watch?
+  standalone: What is the return window for a smartwatch?
+  answerable: true
+  source: returns-policy
+  section: 1. The return window
+  evidence: ["30 days of the delivery date"]
+  reference: Most items, a smartwatch included, can be returned within 30 days of delivery.
+
+- id: KBF-02
+  turn1: My AeroSound headphones stopped working after two months. Are they covered?
+  reply1: >-
+    Yes. Audio products carry a 12-month warranty against faults that appear in
+    normal use [warranty-policy · 2. How long each product type is covered].
+  followup: How do I claim it?
+  standalone: How do I make a warranty claim for faulty headphones?
+  answerable: true
+  source: warranty-policy
+  section: 3. Making a claim
+  evidence: ["order number", "photo or short video"]
+  reference: Write to support with the order number and a photo or short video showing the fault.
+
+- id: KBF-03
+  turn1: How long is the warranty on a smartwatch?
+  reply1: >-
+    Smartwatches are covered for 24 months from delivery [warranty-policy · 2.
+    How long each product type is covered].
+  followup: Who pays the postage if it has to go back?
+  standalone: Who pays the shipping when a smartwatch is sent back under warranty?
+  answerable: true
+  source: warranty-policy
+  section: 3. Making a claim
+  evidence: ["shipping for warranty replacements"]
+  reference: ShopWise pays the shipping for warranty replacements in both directions.
+
+- id: KBF-04
+  turn1: How much is express delivery and how fast is it?
+  reply1: >-
+    Express costs $12.99 and arrives in 1–2 business days [shipping-policy · 2.
+    Delivery options and rates].
+  followup: Can I get it sent to my PO box?
+  standalone: Can express delivery be sent to a PO box?
+  answerable: true
+  source: shipping-policy
+  section: 2. Delivery options and rates
+  evidence: ["Express is not available to PO boxes"]
+  reference: No. Express is not available to PO boxes; standard shipping is.
+
+- id: KBF-05
+  turn1: My tracking hasn't moved in 8 business days. Is my parcel lost?
+  reply1: >-
+    Yes, a parcel is treated as lost after 7 business days without a tracking
+    update, and we send a replacement or a refund, at your choice
+    [shipping-policy · 4. Delays and lost parcels].
+  followup: If I pick the refund, how long until the money is back on my card?
+  standalone: How long does a refund take to reach my card?
+  answerable: true
+  source: returns-policy
+  section: 3. How refunds are paid
+  evidence: ["5–7 business days"]
+  reference: Refunds are paid to the original payment method within 5–7 business days.
+
+- id: KBF-06
+  turn1: Can I get a refund on a gift card someone gave me?
+  reply1: >-
+    No. Gift cards, including ones received as a present, cannot be returned
+    [returns-policy · 2. What cannot be returned].
+  followup: What about something I bought in a clearance sale?
+  standalone: Can I return an item bought in a clearance sale?
+  answerable: true
+  source: returns-policy
+  section: 2. What cannot be returned
+  evidence: ["final sale"]
+  reference: Not if it was marked "final sale" on the product page.

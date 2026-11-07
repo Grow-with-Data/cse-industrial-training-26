@@ -1,0 +1,9 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "team": "./studio.py:team",
+    "inbox": "./studio.py:inbox",
+    "policy": "./studio.py:policy"
+  },
+  "env": "../../.env"
+}

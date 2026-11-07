@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "shopwise": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["run", "python", "mcp_server/server.py"],
+      "env": {}
+    }
+  }
+}
