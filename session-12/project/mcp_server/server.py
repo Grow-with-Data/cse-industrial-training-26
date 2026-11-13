@@ -219,7 +219,6 @@ def draft_reply(ticket_id: str) -> str:
             "Cite each rule's label in square brackets. Do not promise refunds: a manager "
             "decides those. Keep it to a short, warm paragraph.")
 
-
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--transport", choices=["stdio", "streamable-http"], default="stdio")
