@@ -1,0 +1,75 @@
+# team_tickets.yml — eight tickets for the multi-agent comparison (new in v9).
+#
+#   uv run python evals/multiagent_compare.py
+#
+# Four single-issue, four multi-issue, and none asks for money back: a refund
+# pauses for a manager, and a pause is not a reply anyone can score.
+#
+# Correctness is judged on the REPLY, not on who handled it, so the four systems
+# are scored by the same rule however they route:
+#   mention   groups of phrases; each group must have at least one phrase in the
+#             reply (case-insensitive). The facts that must be there.
+#   cite      policy files the reply must cite in [source · section] form.
+# `needs` says which kinds of work the ticket takes, for reading the route
+# column: records (orders), rules (knowledge). Not scored.
+
+- id: TEAM-S1
+  from: tanvir@example.com
+  shape: single
+  needs: [records]
+  body: Where is my PulseFit watch? Order ORD-5003.
+  mention: [["SwiftEx", "SW-88231", "in transit"]]
+
+- id: TEAM-S2
+  from: tanvir@example.com
+  shape: single
+  needs: [rules]
+  body: How long is the warranty on a smartwatch?
+  mention: [["24 months", "24-month", "two years"]]
+  cite: [warranty-policy]
+
+- id: TEAM-S3
+  from: kamal@example.com
+  shape: single
+  needs: [records]
+  body: Is the BrewMaster kettle back in stock yet?
+  mention: [["out of stock", "not in stock", "no stock", "isn't in stock", "is not in stock", "not available", "unavailable", "sold out"]]
+
+- id: TEAM-S4
+  from: priya@example.com
+  shape: single
+  needs: [rules]
+  body: Do you ship to Malaysia?
+  mention: [["United States"]]
+  cite: [shipping-policy]
+
+- id: TEAM-M1
+  from: kamal@example.com
+  shape: multi
+  needs: [records, rules]
+  body: Is your BrewMaster kettle overpriced, and can I return it if it is?
+  mention: [["49"]]
+  cite: [returns-policy]
+
+- id: TEAM-M2
+  from: tanvir@example.com
+  shape: multi
+  needs: [records, rules]
+  body: Where is my watch (ORD-5003), and how long is its warranty?
+  mention: [["SwiftEx", "SW-88231", "in transit"], ["24 months", "24-month", "two years"]]
+  cite: [warranty-policy]
+
+- id: TEAM-M3
+  from: priya@example.com
+  shape: multi
+  needs: [records, rules]
+  body: The zip on my TrailPack 30L (ORD-5004) is separating. Can I still return it, and if not, is it under warranty?
+  cite: [returns-policy, warranty-policy]
+
+- id: TEAM-M4
+  from: ayesha@example.com
+  shape: multi
+  needs: [records, rules]
+  body: My two kettles on ORD-5002 still say processing. When will they ship, and what does your policy say if you can't ship on time?
+  mention: [["processing"]]
+  cite: [shipping-policy]

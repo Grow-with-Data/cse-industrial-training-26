@@ -1,0 +1,1375 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ShopWise API",
+    "description": "\nShopWise's customer-support assistant as an HTTP API.\n\nA **thread** is one customer's conversation. Send it **messages** and get replies,\nwhole or streamed as Server-Sent Events. When a reply needs a refund, the thread\npauses; a manager finds it under **approvals** and resumes it with a decision.\n\nEvery error is `application/problem+json` (RFC 9457): branch on `type`, show `detail`,\nquote `request_id` when reporting a problem.\n\n**Not yet secured.** Anyone who can reach this API can read any thread and approve\nany refund. Session 14 adds API keys.\n",
+    "version": "10.0.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Liveness",
+        "operationId": "health-health",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ready": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Readiness",
+        "operationId": "health-ready",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Readiness"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Not ready yet.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Readiness"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/threads": {
+      "post": {
+        "tags": [
+          "Threads"
+        ],
+        "summary": "Create a thread",
+        "description": "Starts a conversation for one customer. The server mints the id and returns it in the body and in the `Location` header.",
+        "operationId": "threads-create_thread",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ThreadCreate"
+              },
+              "examples": {
+                "ayesha": {
+                  "summary": "A known customer",
+                  "description": "Any email from labs/data/backend.yml's customers works.",
+                  "value": {
+                    "customer_email": "ayesha@example.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Threads"
+        ],
+        "summary": "List threads",
+        "description": "Newest activity first. Pass `next_cursor` from one page as `cursor` to get the next. Cursor pagination does not skip or repeat threads that move while you page, which offset pagination does.",
+        "operationId": "threads-list_threads",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Opaque: from a previous page.",
+              "title": "Cursor"
+            },
+            "description": "Opaque: from a previous page."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadList"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
+    "/v1/threads/{thread_id}": {
+      "get": {
+        "tags": [
+          "Threads"
+        ],
+        "summary": "Get one thread",
+        "description": "Metadata and status: `idle`, `running` or `awaiting_approval`.",
+        "operationId": "threads-get_thread",
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Thread Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Threads"
+        ],
+        "summary": "Delete a thread",
+        "description": "Removes the thread and every checkpoint it saved. Not the customer's long-term memories: those belong to the customer, not to one thread.",
+        "operationId": "threads-delete_thread",
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Thread Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/threads/{thread_id}/messages": {
+      "get": {
+        "tags": [
+          "Threads"
+        ],
+        "summary": "Get a thread's history",
+        "description": "The conversation so far, customer and assistant turns in order. Also how a client recovers a reply after its stream was cut off.",
+        "operationId": "threads-get_history",
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Thread Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadHistory"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Send a message and wait for the reply",
+        "description": "Runs one turn and returns the whole reply with its citations. If the turn asks for a refund, it pauses: `status` is `awaiting_approval` and `interrupt` holds the form a manager answers with `POST /v1/threads/{id}/resume`.",
+        "operationId": "messages-send_message",
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Thread Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageIn"
+              },
+              "examples": {
+                "order_status": {
+                  "summary": "Where is my order?",
+                  "description": "The orders specialist looks it up.",
+                  "value": {
+                    "text": "Where is ORD-5002?"
+                  }
+                },
+                "policy": {
+                  "summary": "A policy question (cites its sources)",
+                  "description": "The knowledge specialist answers from the policies, with [source · section] citations.",
+                  "value": {
+                    "text": "Can I return headphones I opened 10 days ago?"
+                  }
+                },
+                "refund": {
+                  "summary": "A refund request (pauses for a manager)",
+                  "description": "The turn ends with status awaiting_approval and an interrupt.",
+                  "value": {
+                    "text": "The headphones from ORD-5001 stopped working. I want my money back."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageOut"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "502": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Gateway"
+          }
+        }
+      }
+    },
+    "/v1/threads/{thread_id}/messages/stream": {
+      "post": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Send a message and stream the reply (SSE)",
+        "operationId": "messages-stream_message",
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Thread Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageIn"
+              },
+              "examples": {
+                "order_status": {
+                  "summary": "Where is my order?",
+                  "description": "The orders specialist looks it up.",
+                  "value": {
+                    "text": "Where is ORD-5002?"
+                  }
+                },
+                "policy": {
+                  "summary": "A policy question (cites its sources)",
+                  "description": "The knowledge specialist answers from the policies, with [source · section] citations.",
+                  "value": {
+                    "text": "Can I return headphones I opened 10 days ago?"
+                  }
+                },
+                "refund": {
+                  "summary": "A refund request (pauses for a manager)",
+                  "description": "The turn ends with status awaiting_approval and an interrupt.",
+                  "value": {
+                    "text": "The headphones from ORD-5001 stopped working. I want my money back."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A stream of Server-Sent Events. Each frame's `event:` is one of `token`, `progress`, `tool`, `citation`, `interrupt`, `done`, `error`; its `data:` is the JSON event (see the `Event` schemas). A turn ends with `done`, `interrupt` (paused for a manager) or `error`.",
+            "content": {
+              "text/event-stream": {
+                "itemSchema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "string"
+                    },
+                    "event": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "retry": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                },
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "text/event-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {},
+              "text/event-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "text/event-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        }
+      }
+    },
+    "/v1/approvals": {
+      "get": {
+        "tags": [
+          "Approvals"
+        ],
+        "summary": "List pending approvals",
+        "description": "Every refund waiting for a manager, across all threads.",
+        "operationId": "approvals-list_approvals",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApprovalList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/threads/{thread_id}/resume": {
+      "post": {
+        "tags": [
+          "Approvals"
+        ],
+        "summary": "Approve, edit or reject a paused refund",
+        "description": "Resumes the thread with the manager's decision and returns the reply that follows. Needs an `Idempotency-Key` header: a retry with the same key and body returns the stored response without resuming again.",
+        "operationId": "approvals-resume_thread",
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Thread Id"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 8,
+                  "maxLength": 128
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A fresh UUID per decision; the same one on every retry of it.",
+              "title": "Idempotency-Key"
+            },
+            "description": "A fresh UUID per decision; the same one on every retry of it."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Decision"
+              },
+              "examples": {
+                "approve": {
+                  "summary": "Approve as requested",
+                  "value": {
+                    "type": "approve"
+                  }
+                },
+                "edit": {
+                  "summary": "Pay a different amount",
+                  "value": {
+                    "type": "edit",
+                    "amount": 99.0,
+                    "reason": "Partial refund: the carrying case was not returned."
+                  }
+                },
+                "reject": {
+                  "summary": "Refuse",
+                  "value": {
+                    "type": "reject",
+                    "reason": "Outside the 30-day return window."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageOut"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "502": {
+            "content": {
+              "application/problem+json": {},
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Gateway"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApprovalList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PendingApproval"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "ApprovalList"
+      },
+      "ApprovalRequest": {
+        "properties": {
+          "interrupt_id": {
+            "type": "string",
+            "title": "Interrupt Id",
+            "description": "Send it back with the decision when a thread has two."
+          },
+          "order_id": {
+            "type": "string",
+            "title": "Order Id",
+            "examples": [
+              "ORD-5001"
+            ]
+          },
+          "amount": {
+            "type": "number",
+            "title": "Amount",
+            "description": "What the customer asked for, in USD.",
+            "examples": [
+              129.0
+            ]
+          },
+          "max_amount": {
+            "type": "number",
+            "title": "Max Amount",
+            "description": "What was paid for the order: the most a refund can be."
+          },
+          "recommendation": {
+            "type": "string",
+            "title": "Recommendation",
+            "description": "What the rules suggest: approve or reject.",
+            "examples": [
+              "approve"
+            ]
+          },
+          "why": {
+            "type": "string",
+            "title": "Why",
+            "examples": [
+              "inside the 30-day return window (12 days since delivery)"
+            ]
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error",
+            "description": "Why the previous decision was refused, if one was."
+          }
+        },
+        "type": "object",
+        "required": [
+          "interrupt_id",
+          "order_id",
+          "amount",
+          "max_amount",
+          "recommendation",
+          "why"
+        ],
+        "title": "ApprovalRequest",
+        "description": "The form a manager must answer before a refund is paid (session 11's interrupt).\n\nextra=\"ignore\": the graph's payload carries internal fields too (ticket id,\ncustomer id); the API passes on only what a manager needs to decide."
+      },
+      "CitationOut": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label",
+            "examples": [
+              "returns-policy · 1. The return window"
+            ]
+          },
+          "source": {
+            "type": "string",
+            "title": "Source",
+            "examples": [
+              "returns-policy"
+            ]
+          },
+          "section": {
+            "type": "string",
+            "title": "Section",
+            "examples": [
+              "1. The return window"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "source",
+          "section"
+        ],
+        "title": "CitationOut"
+      },
+      "Decision": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "edit",
+              "reject"
+            ],
+            "title": "Type"
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount",
+            "description": "Required for edit: what to pay instead."
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason",
+            "description": "Required for edit and reject: the customer is told it."
+          },
+          "interrupt_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interrupt Id",
+            "description": "Which request this answers. Needed only if the thread has two."
+          }
+        },
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "title": "Decision",
+        "description": "A manager's answer. The graph checks it again (an amount above what was\npaid is refused there); this model catches the obvious mistakes first,\nwith a 422 that names the field."
+      },
+      "FieldError": {
+        "properties": {
+          "field": {
+            "type": "string",
+            "title": "Field",
+            "examples": [
+              "body.text"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "examples": [
+              "String should have at most 4000 characters"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "field",
+          "message"
+        ],
+        "title": "FieldError",
+        "description": "One invalid field in a 422, in a shape a form can show next to the input."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Health": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "ok",
+            "title": "Status",
+            "default": "ok"
+          }
+        },
+        "type": "object",
+        "title": "Health"
+      },
+      "HistoryMessage": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "customer",
+              "assistant"
+            ],
+            "title": "Role"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "role",
+          "text"
+        ],
+        "title": "HistoryMessage"
+      },
+      "MessageIn": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Text",
+            "description": "What the customer wrote. 1 to 4000 characters.",
+            "examples": [
+              "Where is ORD-5002?"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "MessageIn"
+      },
+      "MessageOut": {
+        "properties": {
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
+          "reply": {
+            "type": "string",
+            "title": "Reply",
+            "description": "Empty when the turn paused for a manager."
+          },
+          "citations": {
+            "items": {
+              "$ref": "#/components/schemas/CitationOut"
+            },
+            "type": "array",
+            "title": "Citations"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "idle",
+              "running",
+              "awaiting_approval"
+            ],
+            "title": "Status"
+          },
+          "interrupt": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ApprovalRequest"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Present when status is awaiting_approval."
+          }
+        },
+        "type": "object",
+        "required": [
+          "thread_id",
+          "reply",
+          "citations",
+          "status"
+        ],
+        "title": "MessageOut"
+      },
+      "PendingApproval": {
+        "properties": {
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
+          "customer_email": {
+            "type": "string",
+            "title": "Customer Email"
+          },
+          "request": {
+            "$ref": "#/components/schemas/ApprovalRequest"
+          }
+        },
+        "type": "object",
+        "required": [
+          "thread_id",
+          "customer_email",
+          "request"
+        ],
+        "title": "PendingApproval"
+      },
+      "Problem": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "title": "Type",
+            "description": "A stable URI naming the kind of error.",
+            "examples": [
+              "https://shopwise.example/problems/thread-not-found"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "examples": [
+              "There is no thread with that id."
+            ]
+          },
+          "status": {
+            "type": "integer",
+            "title": "Status",
+            "examples": [
+              404
+            ]
+          },
+          "detail": {
+            "type": "string",
+            "title": "Detail",
+            "examples": [
+              "No thread 3f2b…"
+            ]
+          },
+          "instance": {
+            "type": "string",
+            "title": "Instance",
+            "description": "The path that was requested.",
+            "examples": [
+              "/v1/threads/3f2b…"
+            ]
+          },
+          "request_id": {
+            "type": "string",
+            "title": "Request Id",
+            "examples": [
+              "9c1e0b7a4d"
+            ]
+          },
+          "errors": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/FieldError"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Errors",
+            "description": "Present on 422 only."
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "title",
+          "status",
+          "detail",
+          "instance",
+          "request_id"
+        ],
+        "title": "Problem",
+        "description": "An error, as RFC 9457 \"problem details\" (`application/problem+json`).\n\nBranch on `type`; it never changes. Show `detail` to a person; its wording may.\nQuote `request_id` when reporting a bug: the server's log has every line that\nrequest wrote under the same id."
+      },
+      "Readiness": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "not_ready"
+            ],
+            "title": "Status"
+          },
+          "checks": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "type": "object",
+            "title": "Checks"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "checks",
+          "version"
+        ],
+        "title": "Readiness"
+      },
+      "ThreadCreate": {
+        "properties": {
+          "customer_email": {
+            "type": "string",
+            "maxLength": 254,
+            "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+            "title": "Customer Email",
+            "examples": [
+              "ayesha@example.com"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "customer_email"
+        ],
+        "title": "ThreadCreate",
+        "description": "Start a conversation for one customer.\n\nUntil session 14 adds API keys, the customer is named in the body. That is the\nlimitation this version admits: anyone who can reach the API can act for anyone."
+      },
+      "ThreadHistory": {
+        "properties": {
+          "thread_id": {
+            "type": "string",
+            "title": "Thread Id"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary",
+            "description": "Older turns, folded into one summary once the thread grew long (session 11)."
+          },
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/HistoryMessage"
+            },
+            "type": "array",
+            "title": "Messages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "thread_id",
+          "summary",
+          "messages"
+        ],
+        "title": "ThreadHistory"
+      },
+      "ThreadList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ThreadOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor",
+            "description": "Pass as ?cursor= to get the next page. None on the last page."
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "next_cursor"
+        ],
+        "title": "ThreadList"
+      },
+      "ThreadOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Minted by the server. Never chosen by the client."
+          },
+          "customer_email": {
+            "type": "string",
+            "title": "Customer Email"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title",
+            "description": "The first message, shortened. None until one is sent."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "idle",
+              "running",
+              "awaiting_approval"
+            ],
+            "title": "Status"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "customer_email",
+          "title",
+          "status",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ThreadOut"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Threads",
+      "description": "Conversations: create, list, read, delete."
+    },
+    {
+      "name": "Messages",
+      "description": "Send a message; get the reply whole or as an SSE stream."
+    },
+    {
+      "name": "Approvals",
+      "description": "Refunds waiting for a manager, and the decision that resumes them."
+    },
+    {
+      "name": "Health",
+      "description": "Liveness and readiness, for machines. Unversioned."
+    }
+  ]
+}

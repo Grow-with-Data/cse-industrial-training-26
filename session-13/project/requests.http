@@ -1,0 +1,75 @@
+# The whole v10 story, one request at a time.
+# VS Code: install "REST Client", start the server (uv run fastapi dev), then
+# click "Send Request" above each block. Requests marked 💸 call the model.
+
+@base = http://127.0.0.1:8000
+
+### 1. Is it up?
+GET {{base}}/health
+
+### 2. Is it ready (graph built, databases open)?
+GET {{base}}/ready
+
+### 3. Create a thread for Ayesha. Copy the "id" from the response into @thread below.
+POST {{base}}/v1/threads
+Content-Type: application/json
+
+{"customer_email": "ayesha@example.com"}
+
+###
+@thread = paste-the-thread-id-here
+
+### 4. 💸 A policy question, streamed. Watch token, citation and done frames arrive.
+POST {{base}}/v1/threads/{{thread}}/messages/stream
+Content-Type: application/json
+
+{"text": "Can I return headphones I opened 10 days ago?"}
+
+### 5. 💸 Ask for a refund. The reply pauses: status awaiting_approval, with an interrupt.
+POST {{base}}/v1/threads/{{thread}}/messages
+Content-Type: application/json
+
+{"text": "The headphones from ORD-5001 stopped working. I want my money back."}
+
+### 6. The manager's inbox
+GET {{base}}/v1/approvals
+
+### 7. 💸 Approve it, with an Idempotency-Key
+POST {{base}}/v1/threads/{{thread}}/resume
+Content-Type: application/json
+Idempotency-Key: 6f1c2a9e-0b7d-4f3e-9a51-2d8c4e7b1a00
+
+{"type": "approve"}
+
+### 8. The network dropped and the app retries: SAME key, SAME body.
+#    Free: the stored response comes back with Idempotent-Replayed: true. One refund.
+POST {{base}}/v1/threads/{{thread}}/resume
+Content-Type: application/json
+Idempotency-Key: 6f1c2a9e-0b7d-4f3e-9a51-2d8c4e7b1a00
+
+{"type": "approve"}
+
+### 9. Same key, DIFFERENT body: 422 idempotency-key-reused
+POST {{base}}/v1/threads/{{thread}}/resume
+Content-Type: application/json
+Idempotency-Key: 6f1c2a9e-0b7d-4f3e-9a51-2d8c4e7b1a00
+
+{"type": "reject", "reason": "changed my mind"}
+
+### 10. The conversation so far
+GET {{base}}/v1/threads/{{thread}}/messages
+
+### 11. Every thread, newest first, two per page
+GET {{base}}/v1/threads?limit=2
+
+### 12. Errors are problem details: an unknown thread
+GET {{base}}/v1/threads/does-not-exist
+
+### 13. ...and a validation error, field by field
+POST {{base}}/v1/threads/{{thread}}/messages
+Content-Type: application/json
+
+{"text": ""}
+
+### 14. Delete the thread and its checkpoints
+DELETE {{base}}/v1/threads/{{thread}}

@@ -1,0 +1,112 @@
+# rag_eval.yml — the questions v8's knowledge base could not get right (new in v9).
+#
+# Two kinds, each aimed at one of session 12's techniques. Scored by
+#   uv run python evals/run_eval.py --rag-eval
+# with the same refusal / citation / retrieval columns as data/kb_questions.yml,
+# so the two files read as one scorecard.
+#
+# PRECEDENT (KBP-)  answerable only from past tickets (kb/past_tickets.yml). The
+#                   policies say what the rule IS; these ask what was DONE. On
+#                   v8, which has no second source, they can only be refused or
+#                   answered from a rule, and both score red.
+#                     tickets   the past tickets that answer it: retrieval counts a
+#                               hit if any of them came back holding `evidence`;
+#                               citation counts if the answer names one of them,
+#                               outside square brackets (precedent, not a rule).
+# FILTERED (KBS-)   policy questions that IMPLY a filter: a product type, a
+#                   topic, or the law as opposed to the shop. `implies` is what a
+#                   correct self-query extracts, written by a person; it is
+#                   printed beside what the model extracted, never scored.
+#
+# Shape otherwise as kb_questions.yml: id, question, answerable, source, section,
+# evidence, reference.
+
+- id: KBP-01
+  question: My PulseFit strap snapped after two months. Has this happened to other customers, and what did you do?
+  answerable: true
+  source: past-tickets
+  tickets: [TCK-H01]
+  evidence: ["strap"]
+  reference: In a similar case a snapped strap was treated as a fault under the 24-month wearables warranty and a replacement strap was sent.
+
+- id: KBP-02
+  question: Have other customers had a crackling earcup on their AeroSound headphones? What did you do for them?
+  answerable: true
+  source: past-tickets
+  tickets: [TCK-H02, TCK-002]
+  evidence: ["crackl"]
+  reference: Yes. Inside the window it was returned and refunded; after it, a warranty replacement was sent.
+
+- id: KBP-03
+  question: I dropped my kettle and the base cracked. Have you ever covered that for anyone?
+  answerable: true
+  source: past-tickets
+  tickets: [TCK-H03]
+  evidence: ["dropped"]
+  reference: No. A similar claim was declined, because the warranty does not cover accidental damage such as drops.
+
+- id: KBP-04
+  question: My card shows two charges for one order. Has that happened to anyone before, and how was it sorted out?
+  answerable: true
+  source: past-tickets
+  tickets: [TCK-009]
+  evidence: ["authorisation"]
+  reference: In a similar case the second charge was an authorisation hold that dropped off within three business days.
+
+- id: KBP-05
+  question: My parcel's tracking hasn't moved for over a week. What did you do the last time this happened to someone?
+  answerable: true
+  source: past-tickets
+  tickets: [TCK-H05, TCK-017]
+  evidence: ["tracking"]
+  reference: After 7 business days without an update the parcel was treated as lost and a replacement was sent.
+
+- id: KBP-06
+  question: Has anyone ever been given a student discount by ShopWise?
+  answerable: false
+  reference: Neither the policies nor past tickets cover it; the team will follow up.
+
+- id: KBS-01
+  question: What's the warranty on wearables?
+  answerable: true
+  source: warranty-policy
+  section: 2. How long each product type is covered
+  evidence: ["Wearables", "24 months"]
+  implies: {topic: warranty, product_type: wearables}
+  reference: Wearables are covered for 24 months from delivery.
+
+- id: KBS-02
+  question: What does the regulator say about how long a seller can take to ship an order?
+  answerable: true
+  source: ftc-prompt-delivery
+  section: p.1
+  evidence: ["within 30 days"]
+  implies: {topic: shipping, authority: regulator}
+  reference: By law, a seller that states no time must ship within 30 days.
+
+- id: KBS-03
+  question: Legally speaking, what makes a warranty a "limited" one?
+  answerable: true
+  source: cfr-16-part-700
+  section: p.4
+  evidence: ["Limited Warranty"]
+  implies: {topic: warranty, authority: regulator}
+  reference: A written warranty that does not meet the federal minimum standards must be designated limited.
+
+- id: KBS-04
+  question: Not the law, your own policy please. When do you treat a parcel as lost?
+  answerable: true
+  source: shipping-policy
+  section: 4. Delays and lost parcels
+  evidence: ["7 business days"]
+  implies: {topic: shipping, authority: shop}
+  reference: When tracking has not updated for 7 business days.
+
+- id: KBS-05
+  question: Is there any warranty at all on outdoor gear?
+  answerable: true
+  source: warranty-policy
+  section: 2. How long each product type is covered
+  evidence: ["Outdoor", "no warranty"]
+  implies: {topic: warranty, product_type: outdoor}
+  reference: No. Outdoor products carry no ShopWise warranty, though faults within 30 days can be raised as returns.

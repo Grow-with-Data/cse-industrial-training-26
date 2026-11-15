@@ -1,0 +1,40 @@
+{
+  "ThreadCreate": {
+    "ayesha": {
+      "summary": "A known customer",
+      "description": "Any email from labs/data/backend.yml's customers works.",
+      "value": {"customer_email": "ayesha@example.com"}
+    }
+  },
+  "MessageIn": {
+    "order_status": {
+      "summary": "Where is my order?",
+      "description": "The orders specialist looks it up.",
+      "value": {"text": "Where is ORD-5002?"}
+    },
+    "policy": {
+      "summary": "A policy question (cites its sources)",
+      "description": "The knowledge specialist answers from the policies, with [source · section] citations.",
+      "value": {"text": "Can I return headphones I opened 10 days ago?"}
+    },
+    "refund": {
+      "summary": "A refund request (pauses for a manager)",
+      "description": "The turn ends with status awaiting_approval and an interrupt.",
+      "value": {"text": "The headphones from ORD-5001 stopped working. I want my money back."}
+    }
+  },
+  "Decision": {
+    "approve": {
+      "summary": "Approve as requested",
+      "value": {"type": "approve"}
+    },
+    "edit": {
+      "summary": "Pay a different amount",
+      "value": {"type": "edit", "amount": 99.0, "reason": "Partial refund: the carrying case was not returned."}
+    },
+    "reject": {
+      "summary": "Refuse",
+      "value": {"type": "reject", "reason": "Outside the 30-day return window."}
+    }
+  }
+}
